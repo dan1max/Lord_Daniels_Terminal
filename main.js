@@ -123,6 +123,17 @@ function updateClock() {
 }
 
 // ─── NAVIGATION ─────────────────────────────────────
+var hamburger = document.getElementById('nav-hamburger');
+var navItems  = document.getElementById('nav-items');
+
+if (hamburger && navItems) {
+  hamburger.addEventListener('click', function() {
+    var isOpen = navItems.classList.toggle('open');
+    hamburger.classList.toggle('open', isOpen);
+    hamburger.textContent = isOpen ? '[ MENÚ ▲ ]' : '[ MENÚ ▼ ]';
+  });
+}
+
 document.querySelectorAll('.nav-btn[data-section]').forEach(function(btn) {
   btn.addEventListener('click', function() {
     var target = btn.dataset.section;
@@ -130,6 +141,9 @@ document.querySelectorAll('.nav-btn[data-section]').forEach(function(btn) {
     document.getElementById('section-' + target).classList.remove('hidden');
     document.querySelectorAll('.nav-btn[data-section]').forEach(function(b) { b.classList.remove('active'); });
     btn.classList.add('active');
+    // Close mobile menu on section select
+    if (navItems) { navItems.classList.remove('open'); }
+    if (hamburger) { hamburger.classList.remove('open'); hamburger.textContent = '[ MENÚ ▼ ]'; }
   });
 });
 

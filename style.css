@@ -1,6 +1,6 @@
 /* ═══════════════════════════════════════════════════════
    LORD DANIEL'S TERMINAL — STYLESHEET
-   Fallout Terminal Aesthetic — Green Phosphor
+   Green Phosphor
 ═══════════════════════════════════════════════════════ */
 
 :root {
@@ -581,6 +581,90 @@ html, body {
 ::-webkit-scrollbar-track { background: var(--black); }
 ::-webkit-scrollbar-thumb { background: var(--green-dark); }
 ::-webkit-scrollbar-thumb:hover { background: var(--green-dim); }
+
+/* ─── KILL SCREEN ──────────────────────────────────── */
+#kill-screen {
+  position: fixed;
+  inset: 0;
+  background: #000;
+  z-index: 9995;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
+#kill-screen.hidden { display: none !important; }
+
+.kill-scanlines {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0,0,0,0.35) 3px
+  );
+  z-index: 1;
+}
+
+.kill-vignette {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.92) 100%);
+  z-index: 2;
+}
+
+.kill-content {
+  position: relative;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2.5rem;
+}
+
+.kill-no-signal {
+  font-family: var(--font-display);
+  font-size: clamp(4rem, 12vw, 10rem);
+  color: var(--green-dim);
+  letter-spacing: 0.2em;
+  text-shadow: 0 0 8px rgba(57,255,20,0.2);
+  animation: kill-glitch 1s steps(1) infinite;
+  line-height: 1;
+}
+
+@keyframes kill-glitch {
+  0%    { color: var(--green-dim); text-shadow: 0 0 8px rgba(57,255,20,0.2); transform: translateX(0); clip-path: none; }
+  2%    { color: var(--green-mid); text-shadow: 3px 0 0 rgba(57,255,20,0.5), -3px 0 0 rgba(0,200,60,0.3), 0 0 12px rgba(57,255,20,0.3); transform: translateX(-3px); clip-path: inset(8% 0 78% 0); }
+  4%    { color: var(--green-dim); text-shadow: -2px 0 0 rgba(57,255,20,0.4), 4px 0 0 rgba(0,255,80,0.2); transform: translateX(3px); clip-path: inset(55% 0 15% 0); }
+  6%    { color: var(--green-dim); text-shadow: 0 0 8px rgba(57,255,20,0.2); transform: translateX(0); clip-path: none; }
+  100%  { color: var(--green-dim); text-shadow: 0 0 8px rgba(57,255,20,0.2); transform: translateX(0); clip-path: none; }
+}
+
+.kill-lines {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  width: clamp(200px, 40vw, 500px);
+}
+
+.kill-line {
+  height: 1px;
+  background: var(--green-dark);
+  animation: kill-line-flicker 4s ease-in-out infinite;
+  opacity: 0.4;
+}
+
+.kill-line:nth-child(2) { animation-delay: 1.3s; width: 70%; }
+.kill-line:nth-child(3) { animation-delay: 2.7s; width: 45%; }
+
+@keyframes kill-line-flicker {
+  0%, 100% { opacity: 0.4; }
+  50%       { opacity: 0.1; }
+}
 
 /* ─── UTILS ────────────────────────────────────────── */
 .hidden { display: none !important; }

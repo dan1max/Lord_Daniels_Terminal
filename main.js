@@ -61,13 +61,13 @@ async function runBootSequence() {
   const sub = document.getElementById('boot-sub');
 
   const stages = [
-    { target: 18,  label: '.',      delay: 30 },
-    { target: 35,  label: '..',          delay: 25 },
-    { target: 52,  label: '...',      delay: 20 },
-    { target: 67,  label: '.',   delay: 22 },
-    { target: 81,  label: '..',     delay: 18 },
-    { target: 93,  label: '...', delay: 28 },
-    { target: 100, label: 'READY',                        delay: 15 },
+    { target: 18,  label: 'CARGANDO MÓDULOS DE ANÁLISIS...',      delay: 30 },
+    { target: 35,  label: 'VERIFICANDO BASE DE DATOS...',          delay: 25 },
+    { target: 52,  label: 'CALIBRANDO ÍNDICES ECONÓMICOS...',      delay: 20 },
+    { target: 67,  label: 'SINCRONIZANDO DATOS GEOPOLÍTICOS...',   delay: 22 },
+    { target: 81,  label: 'COMPILANDO MODELOS PREDICTIVOS...',     delay: 18 },
+    { target: 93,  label: 'APLICANDO PROTOCOLOS DE SEGURIDAD...', delay: 28 },
+    { target: 100, label: 'SISTEMA LISTO.',                        delay: 15 },
   ];
 
   let current = 0;
@@ -157,10 +157,7 @@ async function loadSectionContent(seccion) {
   const predContainer = document.getElementById(`${seccion}-predicciones`);
   if (predContainer) {
     if (predicciones.length === 0) {
-      predContainer.innerHTML = `
-        <div class="empty-state">
-          <div class="no-signal-text">NO SIGNAL</div>
-        </div>`;
+      predContainer.innerHTML = noSignalHTML();
     } else {
       predContainer.innerHTML = predicciones.map(renderPrediccion).join('');
     }
@@ -171,10 +168,7 @@ async function loadSectionContent(seccion) {
   const analContainer = document.getElementById(`${seccion}-analisis`);
   if (analContainer) {
     if (!analisis) {
-      analContainer.innerHTML = `
-        <div class="empty-state">
-          <div class="no-signal-text">NO SIGNAL</div>
-        </div>`;
+      analContainer.innerHTML = noSignalHTML();
     } else {
       analContainer.innerHTML = renderAnalisis(analisis.contenido);
     }
@@ -206,10 +200,7 @@ function renderPrediccion(p) {
 }
 
 function renderAnalisis(texto) {
-  if (!texto) return `
-    <div class="empty-state">
-      <div class="no-signal-text">NO SIGNAL</div>
-    </div>`;
+  if (!texto) return noSignalHTML();
   // Convierte saltos de línea en párrafos, *texto* en highlight
   const html = texto
     .split('\n\n')
@@ -221,7 +212,14 @@ function renderAnalisis(texto) {
   return `<div class="analysis-block">${html}</div>`;
 }
 
-function escHtml(str) {
+function noSignalHTML() {
+  // Delay aleatorio entre 0 y 14s para desincronizar cada panel
+  const delay = (Math.random() * 14).toFixed(2);
+  return `
+    <div class="empty-state">
+      <div class="no-signal-text" style="animation-duration:${10 + Math.random() * 5 | 0}s; animation-delay:-${delay}s">NO SIGNAL</div>
+    </div>`;
+}
   const div = document.createElement('div');
   div.textContent = str;
   return div.innerHTML;

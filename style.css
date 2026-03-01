@@ -582,6 +582,9 @@ html, body {
 ::-webkit-scrollbar-thumb { background: var(--green-dark); }
 ::-webkit-scrollbar-thumb:hover { background: var(--green-dim); }
 
+/* ─── UTILS ────────────────────────────────────────── */
+.hidden { display: none !important; }
+
 /* ─── CHAT ─────────────────────────────────────────── */
 .chat-panel-full {
   min-height: 400px;

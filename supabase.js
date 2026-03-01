@@ -216,3 +216,28 @@ function suscribirConfig(callback) {
     .on('postgres_changes', { event: '*', schema: 'public', table: 'config' }, callback)
     .subscribe();
 }
+
+// ─── SITE ACTIVO (kill switch) ───────────────────────
+async function getSiteActivo() {
+  var result = await supabaseClient
+    .from('config')
+    .select('valor')
+    .eq('clave', 'site_activo')
+    .single();
+  if (!result.data) { return true; } // default: site on
+  return result.data.valor !== 'false';
+}
+
+async function setSiteActivo(activo) {
+  var existing = await supabaseClient
+    .from('config')
+    .select('id')
+    .eq('clave', 'site_activo')
+    .single();
+
+  if (existing.data) {
+    return supabaseClient.from('config').update({ valor: String(activo) }).eq('clave', 'site_activo');
+  } else {
+    return supabaseClient.from('config').insert([{ clave: 'site_activo', valor: String(activo) }]);
+  }
+}

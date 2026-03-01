@@ -14,7 +14,7 @@ const BOOT_LINES = [
   '> EJECUTANDO MODELOS PREDICTIVOS...',
   '> CALIBRANDO ÍNDICES DE INESTABILIDAD...',
   '> ADVERTENCIA: LOS DATOS SON ESTIMACIONES. EL FUTURO ES INCIERTO.',
-  '> DETECTOR DE POSICIÓN ACTIVADO.',
+  '> DETECTOR DE POSICION ACTIVADO.',
   '',
   '> SISTEMA LISTO.',
   '> BIENVENIDO.',
@@ -61,13 +61,13 @@ async function runBootSequence() {
   const sub = document.getElementById('boot-sub');
 
   const stages = [
-    { target: 18,  label: 'CARGANDO MÓDULOS DE ANÁLISIS...',      delay: 30 },
-    { target: 35,  label: 'VERIFICANDO BASE DE DATOS...',          delay: 25 },
-    { target: 52,  label: 'CALIBRANDO ÍNDICES ECONÓMICOS...',      delay: 20 },
-    { target: 67,  label: 'SINCRONIZANDO DATOS GEOPOLÍTICOS...',   delay: 22 },
-    { target: 81,  label: 'COMPILANDO MODELOS PREDICTIVOS...',     delay: 18 },
-    { target: 93,  label: 'APLICANDO PROTOCOLOS DE SEGURIDAD...', delay: 28 },
-    { target: 100, label: 'SISTEMA LISTO.',                        delay: 15 },
+    { target: 18,  label: '.',      delay: 30 },
+    { target: 35,  label: '..',          delay: 25 },
+    { target: 52,  label: '...',      delay: 20 },
+    { target: 67,  label: '.',   delay: 22 },
+    { target: 81,  label: '..',     delay: 18 },
+    { target: 93,  label: '...', delay: 28 },
+    { target: 100, label: 'READY',                        delay: 15 },
   ];
 
   let current = 0;
@@ -160,7 +160,6 @@ async function loadSectionContent(seccion) {
       predContainer.innerHTML = `
         <div class="empty-state">
           <div class="no-signal-text">NO SIGNAL</div>
-          <div class="no-signal-sub">// SIN PREDICCIONES ACTIVAS //</div>
         </div>`;
     } else {
       predContainer.innerHTML = predicciones.map(renderPrediccion).join('');
@@ -175,7 +174,6 @@ async function loadSectionContent(seccion) {
       analContainer.innerHTML = `
         <div class="empty-state">
           <div class="no-signal-text">NO SIGNAL</div>
-          <div class="no-signal-sub">// SIN ANÁLISIS DISPONIBLE //</div>
         </div>`;
     } else {
       analContainer.innerHTML = renderAnalisis(analisis.contenido);
@@ -211,7 +209,6 @@ function renderAnalisis(texto) {
   if (!texto) return `
     <div class="empty-state">
       <div class="no-signal-text">NO SIGNAL</div>
-      <div class="no-signal-sub">// SIN ANÁLISIS //</div>
     </div>`;
   // Convierte saltos de línea en párrafos, *texto* en highlight
   const html = texto

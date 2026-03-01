@@ -93,6 +93,7 @@ async function runBootSequence() {
 
   // Load data after boot
   initTerminal();
+  initChat();
 }
 
 function sleep(ms) {
@@ -227,3 +228,107 @@ function noSignalHTML() {
 
 // ─── START ────────────────────────────────────────────
 window.addEventListener('DOMContentLoaded', runBootSequence);
+
+// ═══════════════════════════════════════════════════
+// CHAT
+// ═══════════════════════════════════════════════════
+
+let chatActivo = false;
+
+async function initChat() {
+  chatActivo = await getChatActivo();
+  renderChatEstado();
+
+  // Cargar mensajes si está abierto
+  if (chatActivo) await cargarMensajes();
+
+  // Realtime: nuevos mensajes
+  suscribirMensajes(payload => {
+    if (chatActivo) appendMensaje(payload.new);
+  });
+
+  // Realtime: cambio de estado del chat
+  suscribirConfig(payload => {
+    if (payload.new && payload.new.clave === 'chat_activo') {
+      chatActivo = payload.new.valor === 'true';
+      renderChatEstado();
+      if (chatActivo) cargarMensajes();
+    }
+  });
+
+  // Enviar mensaje
+  document.getElementById('chat-send').addEventListener('click', enviarMensaje);
+  document.getElementById('chat-msg').addEventListener('keydown', e => {
+    if (e.key === 'Enter') enviarMensaje();
+  });
+}
+
+function renderChatEstado() {
+  const closed = document.getElementById('chat-closed');
+  const open   = document.getElementById('chat-open');
+  if (!closed || !open) return;
+
+  if (chatActivo) {
+    closed.classList.add('hidden');
+    open.classList.remove('hidden');
+  } else {
+    closed.classList.remove('hidden');
+    open.classList.add('hidden');
+    // Aplica animación desincronizada al NO SIGNAL del chat
+    const ns = document.getElementById('chat-no-signal-text');
+    if (ns) {
+      const delay = (Math.random() * 14).toFixed(2);
+      ns.style.animationDuration = (10 + (Math.random() * 5 | 0)) + 's';
+      ns.style.animationDelay = '-' + delay + 's';
+    }
+  }
+}
+
+async function cargarMensajes() {
+  const msgs = await fetchMensajes();
+  const container = document.getElementById('chat-messages');
+  if (!container) return;
+  container.innerHTML = '';
+  msgs.forEach(m => appendMensaje(m, false));
+  scrollChat();
+}
+
+function appendMensaje(m, doScroll = true) {
+  const container = document.getElementById('chat-messages');
+  if (!container) return;
+
+  const hora = new Date(m.created_at).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+  const tipo = m.es_admin ? 'admin' : 'visitor';
+  const alias = m.es_admin ? '[ OPERADOR ]' : (m.alias || 'ANON').toUpperCase();
+
+  const div = document.createElement('div');
+  div.className = `chat-msg ${tipo}`;
+  div.innerHTML = `
+    <div class="chat-msg-header">
+      <span class="chat-msg-alias">${escHtml(alias)}</span>
+      <span class="chat-msg-time">${hora}</span>
+    </div>
+    <div class="chat-msg-text">${escHtml(m.texto)}</div>
+  `;
+  container.appendChild(div);
+  if (doScroll) scrollChat();
+}
+
+function scrollChat() {
+  const wrap = document.querySelector('.chat-messages-wrap');
+  if (wrap) wrap.scrollTop = wrap.scrollHeight;
+}
+
+async function enviarMensaje() {
+  const alias = document.getElementById('chat-alias').value.trim();
+  const texto = document.getElementById('chat-msg').value.trim();
+  if (!texto) return;
+
+  document.getElementById('chat-msg').value = '';
+  document.getElementById('chat-send').disabled = true;
+
+  await insertMensaje(alias, texto, false);
+
+  document.getElementById('chat-send').disabled = false;
+  document.getElementById('chat-msg').focus();
+}

@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
   <title>LORD DANIEL'S TERMINAL</title>
   <link rel="stylesheet" href="style.css" />
   <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=VT323&display=swap" rel="stylesheet" />
@@ -65,12 +65,15 @@
 
     <!-- Navigation -->
     <nav class="terminal-nav">
-      <button class="nav-btn active" data-section="espana">[ ESPAÑA ]</button>
-      <button class="nav-btn" data-section="economia">[ ECONOMÍA GLOBAL ]</button>
-      <button class="nav-btn" data-section="geopolitica">[ GEOPOLÍTICA ]</button>
-      <div class="nav-spacer"></div>
-      <button class="nav-btn" data-section="chat">[ TERMINAL DE CONTACTO ]</button>
-      <a href="panel.html" class="nav-btn nav-admin">[ ADMIN ]</a>
+      <button class="nav-hamburger" id="nav-hamburger">[ MENÚ ▼ ]</button>
+      <div class="nav-items" id="nav-items">
+        <button class="nav-btn active" data-section="espana">[ ESPAÑA ]</button>
+        <button class="nav-btn" data-section="economia">[ ECONOMÍA GLOBAL ]</button>
+        <button class="nav-btn" data-section="geopolitica">[ GEOPOLÍTICA ]</button>
+        <div class="nav-spacer"></div>
+        <button class="nav-btn" data-section="chat">[ TERMINAL DE CONTACTO ]</button>
+        <a href="panel.html" class="nav-btn nav-admin">[ ADMIN ]</a>
+      </div>
     </nav>
 
     <!-- Content -->

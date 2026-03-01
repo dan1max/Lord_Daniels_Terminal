@@ -57,6 +57,7 @@
       <button class="nav-btn" data-section="economia">[ ECONOMÍA GLOBAL ]</button>
       <button class="nav-btn" data-section="geopolitica">[ GEOPOLÍTICA ]</button>
       <div class="nav-spacer"></div>
+      <button class="nav-btn" data-section="chat">[ TERMINAL DE CONTACTO ]</button>
       <a href="panel.html" class="nav-btn nav-admin">[ ADMIN ]</a>
     </nav>
 
@@ -180,11 +181,56 @@
         </div>
       </section>
 
+      <!-- CHAT SECTION -->
+      <section id="section-chat" class="terminal-section hidden">
+        <div class="section-header">
+          <span class="section-title">MÓDULO: TERMINAL DE CONTACTO</span>
+          <span class="section-line">══════════════════════════════════════════════════════════</span>
+        </div>
+
+        <!-- Estado cerrado -->
+        <div id="chat-closed" class="terminal-panel chat-panel-full">
+          <div class="panel-header">▶ ESTADO DEL CANAL</div>
+          <div class="panel-body chat-no-signal">
+            <div class="empty-state">
+              <div class="no-signal-text" id="chat-no-signal-text">NO SIGNAL</div>
+              <div class="chat-closed-label">CANAL CERRADO — EL OPERADOR NO ESTÁ DISPONIBLE</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Estado abierto -->
+        <div id="chat-open" class="chat-layout hidden">
+          <!-- Panel de mensajes -->
+          <div class="terminal-panel chat-panel-msgs">
+            <div class="panel-header" style="display:flex;justify-content:space-between;align-items:center;">
+              <span>▶ CANAL ACTIVO</span>
+              <span class="chat-status-on">● OPERADOR EN LÍNEA</span>
+            </div>
+            <div class="panel-body chat-messages-wrap">
+              <div id="chat-messages"></div>
+              <div id="chat-typing" class="chat-typing hidden">EL OPERADOR ESTÁ ESCRIBIENDO<span class="chat-typing-dots">...</span></div>
+            </div>
+          </div>
+
+          <!-- Input -->
+          <div class="chat-input-wrap">
+            <div class="chat-input-row">
+              <span class="chat-prompt">&gt;</span>
+              <input type="text" id="chat-alias" class="chat-input chat-input-alias" placeholder="ALIAS (opcional)" maxlength="20" />
+              <input type="text" id="chat-msg" class="chat-input chat-input-msg" placeholder="ESCRIBE TU MENSAJE..." maxlength="400" />
+              <button id="chat-send" class="chat-send-btn">[ ENVIAR ]</button>
+            </div>
+            <div class="chat-input-hint">ENTER para enviar · Mensajes visibles para todos</div>
+          </div>
+        </div>
+      </section>
+
     </main>
 
     <!-- Footer -->
     <footer class="terminal-footer">
-      <span>LORD DANIEL'S TERMINAL © 2026</span>
+      <span>LORD DANIEL'S TERMINAL © 2024</span>
       <span class="footer-mid">// DATOS ACTUALIZADOS POR EL OPERADOR //</span>
       <span id="footer-last-update">ÚLTIMA ACTUALIZACIÓN: --</span>
     </footer>

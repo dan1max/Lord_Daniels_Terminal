@@ -61,6 +61,7 @@
     <div style="display:flex;gap:0.5rem;margin-bottom:1.5rem;border-bottom:1px solid var(--green-dark);padding-bottom:0.5rem;">
       <button class="nav-btn active" data-tab="predicciones">[ PREDICCIONES ]</button>
       <button class="nav-btn" data-tab="analisis">[ ANÁLISIS ]</button>
+      <button class="nav-btn" data-tab="chat">[ CHAT ]</button>
     </div>
 
     <!-- TAB: PREDICCIONES -->
@@ -172,6 +173,42 @@ Segundo párrafo del análisis..."></textarea>
             <button id="btn-save-analisis" class="btn-primary">[ GUARDAR ANÁLISIS ]</button>
           </div>
         </div>
+      </div>
+    </div>
+
+    <!-- TAB: CHAT -->
+    <div id="tab-chat" class="admin-tab" style="display:none;">
+      <div style="max-width: 800px; display:flex; flex-direction:column; gap:1.5rem;">
+
+        <!-- Toggle -->
+        <div class="admin-panel">
+          <div class="admin-panel-header">▶ CONTROL DEL CANAL</div>
+          <div class="admin-panel-body" style="display:flex;align-items:center;gap:1.5rem;flex-wrap:wrap;">
+            <button id="btn-toggle-chat" class="toggle-btn-on">[ ACTIVAR TERMINAL ]</button>
+            <div>
+              <div class="chat-toggle-status off" id="chat-toggle-label">CANAL CERRADO — NO SIGNAL</div>
+              <div style="font-size:10px;color:var(--green-dark);letter-spacing:1px;margin-top:4px;">Los visitantes verán el chat en tiempo real al activarlo</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Chat admin -->
+        <div class="admin-panel" id="admin-chat-panel">
+          <div class="admin-panel-header" style="display:flex;justify-content:space-between;">
+            <span>▶ MENSAJES</span>
+            <button id="btn-clear-chat" class="btn-danger" style="font-size:9px;">BORRAR TODO</button>
+          </div>
+          <div class="admin-panel-body">
+            <div class="admin-chat-wrap" id="admin-chat-messages">
+              <div class="loading-text">CARGANDO...</div>
+            </div>
+            <div class="admin-chat-input-row">
+              <input type="text" id="admin-chat-msg" class="form-input" style="flex:1;" placeholder="Responder como OPERADOR..." maxlength="400" />
+              <button id="admin-chat-send" class="btn-primary" style="width:auto;margin-top:0;padding:0.6rem 1.2rem;white-space:nowrap;">[ ENVIAR ]</button>
+            </div>
+          </div>
+        </div>
+
       </div>
     </div>
 

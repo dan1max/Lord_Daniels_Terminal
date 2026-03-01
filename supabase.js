@@ -154,3 +154,65 @@ async function upsertGrafico(nombre, labels, datasets) {
     return { data, error };
   }
 }
+
+// ─── CONFIG (chat_activo) ────────────────────────────
+async function getChatActivo() {
+  const { data } = await supabaseClient
+    .from('config')
+    .select('valor')
+    .eq('clave', 'chat_activo')
+    .single();
+  return data ? data.valor === 'true' : false;
+}
+
+async function setChatActivo(activo) {
+  const { data: existing } = await supabaseClient
+    .from('config')
+    .select('id')
+    .eq('clave', 'chat_activo')
+    .single();
+
+  if (existing) {
+    return supabaseClient.from('config').update({ valor: String(activo) }).eq('clave', 'chat_activo');
+  } else {
+    return supabaseClient.from('config').insert([{ clave: 'chat_activo', valor: String(activo) }]);
+  }
+}
+
+// ─── MENSAJES ────────────────────────────────────────
+async function fetchMensajes(limit = 60) {
+  const { data } = await supabaseClient
+    .from('mensajes')
+    .select('*')
+    .order('created_at', { ascending: true })
+    .limit(limit);
+  return data || [];
+}
+
+async function insertMensaje(alias, texto, esAdmin = false) {
+  const { data, error } = await supabaseClient
+    .from('mensajes')
+    .insert([{ alias: alias || 'ANON', texto, es_admin: esAdmin }])
+    .select()
+    .single();
+  return { data, error };
+}
+
+async function deleteMensaje(id) {
+  return supabaseClient.from('mensajes').delete().eq('id', id);
+}
+
+// ─── REALTIME SUSCRIPCIÓN ────────────────────────────
+function suscribirMensajes(callback) {
+  return supabaseClient
+    .channel('mensajes-canal')
+    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'mensajes' }, callback)
+    .subscribe();
+}
+
+function suscribirConfig(callback) {
+  return supabaseClient
+    .channel('config-canal')
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'config' }, callback)
+    .subscribe();
+}

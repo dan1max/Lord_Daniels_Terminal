@@ -221,6 +221,8 @@ function noSignalHTML() {
       <div class="no-signal-text" style="animation-duration:${10 + Math.random() * 5 | 0}s; animation-delay:-${delay}s">NO SIGNAL</div>
     </div>`;
 }
+
+function escHtml(str) {
   const div = document.createElement('div');
   div.textContent = str;
   return div.innerHTML;

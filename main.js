@@ -196,7 +196,26 @@ function escHtml(str) {
 }
 
 // ─── START ───────────────────────────────────────────
-window.addEventListener('DOMContentLoaded', runBootSequence);
+window.addEventListener('DOMContentLoaded', async function() {
+  var siteActivo = await getSiteActivo();
+  if (!siteActivo) {
+    var ks = document.getElementById('kill-screen');
+    if (ks) { ks.classList.remove('hidden'); }
+    var ns = document.getElementById('kill-no-signal-text');
+    if (ns) {
+      ns.style.animationDuration = (10 + Math.floor(Math.random() * 5)) + 's';
+      ns.style.animationDelay = '-' + (Math.random() * 14).toFixed(2) + 's';
+    }
+    // Sigue escuchando por si el admin reactiva el sitio
+    suscribirConfig(function(payload) {
+      if (payload.new && payload.new.clave === 'site_activo') {
+        if (payload.new.valor !== 'false') { location.reload(); }
+      }
+    });
+    return;
+  }
+  runBootSequence();
+});
 
 // ═══════════════════════════════════════════════════
 // CHAT

@@ -222,3 +222,128 @@ function escHtml(str) {
   div.textContent = str;
   return div.innerHTML;
 }
+
+// ════════════════════════════════════════════════════
+// CHAT ADMIN
+// ════════════════════════════════════════════════════
+
+let adminChatActivo = false;
+
+async function initAdminChat() {
+  adminChatActivo = await getChatActivo();
+  renderToggleUI();
+  await cargarAdminMensajes();
+
+  // Realtime: nuevos mensajes
+  suscribirMensajes(payload => {
+    appendAdminMensaje(payload.new);
+  });
+
+  // Realtime: cambio de estado
+  suscribirConfig(payload => {
+    if (payload.new && payload.new.clave === 'chat_activo') {
+      adminChatActivo = payload.new.valor === 'true';
+      renderToggleUI();
+    }
+  });
+
+  // Toggle
+  document.getElementById('btn-toggle-chat').addEventListener('click', async () => {
+    adminChatActivo = !adminChatActivo;
+    await setChatActivo(adminChatActivo);
+    renderToggleUI();
+    showAlert(adminChatActivo ? '> CANAL ACTIVADO — LOS VISITANTES PUEDEN CHATEAR' : '> CANAL CERRADO — NO SIGNAL');
+  });
+
+  // Enviar respuesta
+  document.getElementById('admin-chat-send').addEventListener('click', enviarRespuestaAdmin);
+  document.getElementById('admin-chat-msg').addEventListener('keydown', e => {
+    if (e.key === 'Enter') enviarRespuestaAdmin();
+  });
+
+  // Borrar todo
+  document.getElementById('btn-clear-chat').addEventListener('click', async () => {
+    if (!confirm('¿Borrar todos los mensajes del chat?')) return;
+    const msgs = await fetchMensajes(200);
+    for (const m of msgs) await deleteMensaje(m.id);
+    document.getElementById('admin-chat-messages').innerHTML = '';
+    showAlert('> HISTORIAL DE CHAT BORRADO');
+  });
+}
+
+function renderToggleUI() {
+  const btn   = document.getElementById('btn-toggle-chat');
+  const label = document.getElementById('chat-toggle-label');
+  if (!btn || !label) return;
+
+  if (adminChatActivo) {
+    btn.textContent = '[ DESACTIVAR TERMINAL ]';
+    btn.className = 'toggle-btn-off';
+    label.textContent = '● CANAL ACTIVO — VISITANTES CONECTADOS';
+    label.className = 'chat-toggle-status on';
+  } else {
+    btn.textContent = '[ ACTIVAR TERMINAL ]';
+    btn.className = 'toggle-btn-on';
+    label.textContent = 'CANAL CERRADO — NO SIGNAL';
+    label.className = 'chat-toggle-status off';
+  }
+}
+
+async function cargarAdminMensajes() {
+  const msgs = await fetchMensajes();
+  const container = document.getElementById('admin-chat-messages');
+  if (!container) return;
+  container.innerHTML = '';
+  msgs.forEach(m => appendAdminMensaje(m, false));
+  scrollAdminChat();
+}
+
+function appendAdminMensaje(m, doScroll = true) {
+  const container = document.getElementById('admin-chat-messages');
+  if (!container) return;
+
+  const hora  = new Date(m.created_at).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+  const tipo  = m.es_admin ? 'admin' : 'visitor';
+  const alias = m.es_admin ? '[ OPERADOR ]' : (m.alias || 'ANON').toUpperCase();
+
+  const div = document.createElement('div');
+  div.className = `chat-msg ${tipo}`;
+  div.style.maxWidth = '100%';
+  div.innerHTML = `
+    <div class="chat-msg-header">
+      <span class="chat-msg-alias">${escHtml(alias)}</span>
+      <span class="chat-msg-time">${hora}</span>
+      <button onclick="deleteMensaje(${m.id}).then(cargarAdminMensajes)" class="btn-danger" style="font-size:9px;padding:1px 5px;margin-left:auto;">✕</button>
+    </div>
+    <div class="chat-msg-text">${escHtml(m.texto)}</div>
+  `;
+  container.appendChild(div);
+  if (doScroll) scrollAdminChat();
+}
+
+function scrollAdminChat() {
+  const el = document.getElementById('admin-chat-messages');
+  if (el) el.scrollTop = el.scrollHeight;
+}
+
+async function enviarRespuestaAdmin() {
+  const texto = document.getElementById('admin-chat-msg').value.trim();
+  if (!texto) return;
+
+  document.getElementById('admin-chat-msg').value = '';
+  const { error } = await insertMensaje('OPERADOR', texto, true);
+  if (error) showAlert('> ERROR AL ENVIAR: ' + error.message, 'error');
+}
+
+// Iniciar chat admin cuando se muestre el tab
+document.querySelectorAll('[data-tab]').forEach(btn => {
+  if (btn.dataset.tab === 'chat') {
+    btn.addEventListener('click', () => {
+      // Solo inicializa una vez
+      if (!document.getElementById('admin-chat-messages').dataset.init) {
+        document.getElementById('admin-chat-messages').dataset.init = '1';
+        initAdminChat();
+      }
+    });
+  }
+});

@@ -33,7 +33,56 @@ async function runBootSequence() {
     log.scrollTop = log.scrollHeight;
   }
 
-  await sleep(800);
+  await sleep(600);
+
+  // Fade out text, show loading bar
+  const bootContent = document.querySelector('.boot-content');
+  bootContent.style.transition = 'opacity 0.6s ease';
+  bootContent.style.opacity = '0';
+
+  await sleep(700);
+  bootContent.style.display = 'none';
+
+  // Inject loading bar
+  bootScreen.insertAdjacentHTML('beforeend', `
+    <div id="boot-loader">
+      <div class="boot-loader-label">INICIANDO SISTEMA...</div>
+      <div class="boot-loader-bar-wrap">
+        <div class="boot-loader-bar" id="boot-bar"></div>
+        <span class="boot-loader-pct" id="boot-pct">0%</span>
+      </div>
+      <div class="boot-loader-sub" id="boot-sub">CARGANDO MÓDULOS</div>
+    </div>
+  `);
+  bootScreen.style.opacity = '1';
+
+  const bar = document.getElementById('boot-bar');
+  const pct = document.getElementById('boot-pct');
+  const sub = document.getElementById('boot-sub');
+
+  const stages = [
+    { target: 18,  label: 'CARGANDO MÓDULOS DE ANÁLISIS...',      delay: 30 },
+    { target: 35,  label: 'VERIFICANDO BASE DE DATOS...',          delay: 25 },
+    { target: 52,  label: 'CALIBRANDO ÍNDICES ECONÓMICOS...',      delay: 20 },
+    { target: 67,  label: 'SINCRONIZANDO DATOS GEOPOLÍTICOS...',   delay: 22 },
+    { target: 81,  label: 'COMPILANDO MODELOS PREDICTIVOS...',     delay: 18 },
+    { target: 93,  label: 'APLICANDO PROTOCOLOS DE SEGURIDAD...', delay: 28 },
+    { target: 100, label: 'SISTEMA LISTO.',                        delay: 15 },
+  ];
+
+  let current = 0;
+  for (const stage of stages) {
+    sub.textContent = stage.label;
+    while (current < stage.target) {
+      current++;
+      bar.style.width = current + '%';
+      pct.textContent = current + '%';
+      await sleep(stage.delay);
+    }
+    await sleep(180);
+  }
+
+  await sleep(600);
   bootScreen.classList.add('fade-out');
 
   await sleep(900);
@@ -108,7 +157,11 @@ async function loadSectionContent(seccion) {
   const predContainer = document.getElementById(`${seccion}-predicciones`);
   if (predContainer) {
     if (predicciones.length === 0) {
-      predContainer.innerHTML = '<div class="empty-state">// SIN PREDICCIONES ACTIVAS //</div>';
+      predContainer.innerHTML = `
+        <div class="empty-state">
+          <div class="no-signal-text">NO SIGNAL</div>
+          <div class="no-signal-sub">// SIN PREDICCIONES ACTIVAS //</div>
+        </div>`;
     } else {
       predContainer.innerHTML = predicciones.map(renderPrediccion).join('');
     }
@@ -119,7 +172,11 @@ async function loadSectionContent(seccion) {
   const analContainer = document.getElementById(`${seccion}-analisis`);
   if (analContainer) {
     if (!analisis) {
-      analContainer.innerHTML = '<div class="empty-state">// SIN ANÁLISIS DISPONIBLE //</div>';
+      analContainer.innerHTML = `
+        <div class="empty-state">
+          <div class="no-signal-text">NO SIGNAL</div>
+          <div class="no-signal-sub">// SIN ANÁLISIS DISPONIBLE //</div>
+        </div>`;
     } else {
       analContainer.innerHTML = renderAnalisis(analisis.contenido);
     }
@@ -151,7 +208,11 @@ function renderPrediccion(p) {
 }
 
 function renderAnalisis(texto) {
-  if (!texto) return '<div class="empty-state">// SIN ANÁLISIS //</div>';
+  if (!texto) return `
+    <div class="empty-state">
+      <div class="no-signal-text">NO SIGNAL</div>
+      <div class="no-signal-sub">// SIN ANÁLISIS //</div>
+    </div>`;
   // Convierte saltos de línea en párrafos, *texto* en highlight
   const html = texto
     .split('\n\n')

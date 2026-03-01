@@ -50,6 +50,7 @@ function showAdmin() {
   document.getElementById('login-view').style.display = 'none';
   document.getElementById('admin-view').style.display = 'block';
   loadPredList();
+  initKillSwitchAdmin();
 }
 
 // ─── TABS ──────────────────────────────────────────────
@@ -347,3 +348,44 @@ document.querySelectorAll('[data-tab]').forEach(btn => {
     });
   }
 });
+
+// ════════════════════════════════════════════════════
+// KILL SWITCH ADMIN
+// ════════════════════════════════════════════════════
+
+var siteActivo = true;
+
+async function initKillSwitchAdmin() {
+  siteActivo = await getSiteActivo();
+  renderKillSwitchUI();
+
+  document.getElementById('btn-kill-switch').addEventListener('click', async function() {
+    siteActivo = !siteActivo;
+    await setSiteActivo(siteActivo);
+    renderKillSwitchUI();
+    showAlert(siteActivo
+      ? '> SITIO REACTIVADO — VISITANTES PUEDEN ACCEDER'
+      : '> KILL SWITCH ACTIVADO — TODOS VEN NO SIGNAL',
+      siteActivo ? 'success' : 'error'
+    );
+  });
+}
+
+function renderKillSwitchUI() {
+  var btn   = document.getElementById('btn-kill-switch');
+  var label = document.getElementById('kill-switch-label');
+  if (!btn || !label) { return; }
+
+  if (siteActivo) {
+    btn.textContent = '[ SITIO ACTIVO ]';
+    btn.className = 'toggle-btn-on';
+    label.textContent = '● SITIO EN LÍNEA — VISITANTES PUEDEN ACCEDER';
+    label.className = 'chat-toggle-status on';
+  } else {
+    btn.textContent = '[ KILL SWITCH ACTIVADO ]';
+    btn.className = 'toggle-btn-off';
+    label.textContent = '⚠ SITIO DESACTIVADO — TODOS VEN NO SIGNAL';
+    label.className = 'chat-toggle-status off';
+    label.style.color = 'var(--red-alert)';
+  }
+}

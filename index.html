@@ -6,19 +6,13 @@
   <title>LORD DANIEL'S TERMINAL</title>
   <link rel="stylesheet" href="style.css" />
   <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=VT323&display=swap" rel="stylesheet" />
-  <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-  <!-- Supabase -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
-
-  <!-- CRT overlay effects -->
   <div class="crt-scanlines"></div>
   <div class="crt-vignette"></div>
   <div class="crt-flicker"></div>
-
-  <!-- KILL SCREEN — fullscreen override -->
   <div id="kill-screen" class="hidden">
     <div class="kill-scanlines"></div>
     <div class="kill-vignette"></div>
@@ -33,25 +27,13 @@
   </div>
   <div id="boot-screen">
     <div class="boot-content">
-      <pre class="boot-art">
-██╗      ██████╗ ██████╗ ██████╗     ██████╗  █████╗ ███╗   ██╗██╗███████╗██╗
-██║     ██╔═══██╗██╔══██╗██╔══██╗    ██╔══██╗██╔══██╗████╗  ██║██║██╔════╝██║
-██║     ██║   ██║██████╔╝██║  ██║    ██║  ██║███████║██╔██╗ ██║██║█████╗  ██║
-██║     ██║   ██║██╔══██╗██║  ██║    ██║  ██║██╔══██║██║╚██╗██║██║██╔══╝  ██║
-███████╗╚██████╔╝██║  ██║██████╔╝    ██████╔╝██║  ██║██║ ╚████║██║███████╗███████╗
-╚══════╝ ╚═════╝ ╚═╝  ╚═╝╚═════╝     ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═══╝╚═╝╚══════╝╚══════╝
-      </pre>
       <div class="boot-terminal">
         <div id="boot-log"></div>
         <div class="boot-cursor">█</div>
       </div>
     </div>
   </div>
-
-  <!-- MAIN TERMINAL -->
   <div id="main-terminal" class="hidden">
-
-    <!-- Header -->
     <header class="terminal-header">
       <div class="header-left">
         <span class="header-title">LORD DANIEL'S TERMINAL</span>
@@ -62,8 +44,6 @@
         <span class="header-status">● ONLINE</span>
       </div>
     </header>
-
-    <!-- Navigation -->
     <nav class="terminal-nav">
       <button class="nav-hamburger" id="nav-hamburger">[ MENÚ ▼ ]</button>
       <div class="nav-items" id="nav-items">
@@ -75,11 +55,7 @@
         <a href="panel.html" class="nav-btn nav-admin">[ ADMIN ]</a>
       </div>
     </nav>
-
-    <!-- Content -->
     <main class="terminal-main">
-
-      <!-- ESPAÑA SECTION -->
       <section id="section-espana" class="terminal-section active">
         <div class="section-header">
           <span class="section-title">MÓDULO: ANÁLISIS POLÍTICO — ESPAÑA</span>
@@ -87,15 +63,12 @@
         </div>
 
         <div class="grid-2col">
-          <!-- Predicciones -->
           <div class="terminal-panel">
             <div class="panel-header">▶ PREDICCIONES ACTIVAS</div>
             <div class="panel-body" id="espana-predicciones">
               <div class="loading-text">CARGANDO DATOS...</div>
             </div>
           </div>
-
-          <!-- Gráfico intención de voto -->
           <div class="terminal-panel">
             <div class="panel-header">▶ INTENCIÓN DE VOTO — TENDENCIA</div>
             <div class="panel-body chart-container">
@@ -105,15 +78,12 @@
         </div>
 
         <div class="grid-2col">
-          <!-- Gráfico popularidad -->
           <div class="terminal-panel">
             <div class="panel-header">▶ POPULARIDAD DE PARTIDOS</div>
             <div class="panel-body chart-container">
               <canvas id="chart-partidos-espana"></canvas>
             </div>
           </div>
-
-          <!-- Análisis -->
           <div class="terminal-panel">
             <div class="panel-header">▶ ANÁLISIS DEL SISTEMA</div>
             <div class="panel-body" id="espana-analisis">
@@ -122,8 +92,6 @@
           </div>
         </div>
       </section>
-
-      <!-- ECONOMÍA SECTION -->
       <section id="section-economia" class="terminal-section hidden">
         <div class="section-header">
           <span class="section-title">MÓDULO: ANÁLISIS ECONÓMICO — GLOBAL</span>
@@ -162,8 +130,6 @@
           </div>
         </div>
       </section>
-
-      <!-- GEOPOLÍTICA SECTION -->
       <section id="section-geopolitica" class="terminal-section hidden">
         <div class="section-header">
           <span class="section-title">MÓDULO: ANÁLISIS GEOPOLÍTICO — MUNDIAL</span>
@@ -195,15 +161,11 @@
           </div>
         </div>
       </section>
-
-      <!-- CHAT SECTION -->
       <section id="section-chat" class="terminal-section hidden">
         <div class="section-header">
           <span class="section-title">MÓDULO: TERMINAL DE CONTACTO</span>
           <span class="section-line">══════════════════════════════════════════════════════════</span>
         </div>
-
-        <!-- Estado cerrado -->
         <div id="chat-closed" class="terminal-panel chat-panel-full">
           <div class="panel-header">▶ ESTADO DEL CANAL</div>
           <div class="panel-body chat-no-signal">
@@ -212,10 +174,7 @@
             </div>
           </div>
         </div>
-
-        <!-- Estado abierto -->
         <div id="chat-open" class="chat-layout hidden">
-          <!-- Panel de mensajes -->
           <div class="terminal-panel chat-panel-msgs">
             <div class="panel-header" style="display:flex;justify-content:space-between;align-items:center;">
               <span>▶ CANAL ACTIVO</span>
@@ -226,8 +185,6 @@
               <div id="chat-typing" class="chat-typing hidden">EL OPERADOR ESTÁ ESCRIBIENDO<span class="chat-typing-dots">...</span></div>
             </div>
           </div>
-
-          <!-- Input -->
           <div class="chat-input-wrap">
             <div class="chat-input-row">
               <span class="chat-prompt">&gt;</span>
@@ -241,8 +198,6 @@
       </section>
 
     </main>
-
-    <!-- Footer -->
     <footer class="terminal-footer">
       <span>LORD DANIEL'S TERMINAL © 2024</span>
       <span class="footer-mid">// DATOS ACTUALIZADOS POR EL OPERADOR //</span>

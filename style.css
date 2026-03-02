@@ -1,6 +1,8 @@
+/* Property of dani.co */
+
 /* ═══════════════════════════════════════════════════════
    LORD DANIEL'S TERMINAL — STYLESHEET
-   Fallout Terminal Aesthetic — Green Phosphor
+   Green Phosphor
 ═══════════════════════════════════════════════════════ */
 
 :root {
@@ -20,7 +22,7 @@
   --scanline-size:  3px;
 }
 
-/* ─── RESET & BASE ─────────────────────────────────── */
+
 *, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
@@ -44,7 +46,7 @@ html, body {
   color: var(--black);
 }
 
-/* ─── CRT EFFECTS ──────────────────────────────────── */
+
 .crt-scanlines {
   position: fixed;
   top: 0; left: 0;
@@ -91,7 +93,7 @@ html, body {
   100% { opacity: 0; }
 }
 
-/* ─── BOOT SCREEN ──────────────────────────────────── */
+
 #boot-screen {
   position: fixed;
   inset: 0;
@@ -163,7 +165,7 @@ html, body {
   50%       { opacity: 0; }
 }
 
-/* ─── MAIN TERMINAL ────────────────────────────────── */
+
 #main-terminal {
   display: flex;
   flex-direction: column;
@@ -175,7 +177,7 @@ html, body {
   display: none;
 }
 
-/* ─── HEADER ───────────────────────────────────────── */
+
 .terminal-header {
   display: flex;
   justify-content: space-between;
@@ -229,7 +231,7 @@ html, body {
   50%       { opacity: 0.5; }
 }
 
-/* ─── NAVIGATION ───────────────────────────────────── */
+
 .terminal-nav {
   display: flex;
   align-items: center;
@@ -280,7 +282,7 @@ html, body {
   box-shadow: 0 0 10px rgba(255,176,0,0.1);
 }
 
-/* ─── MAIN CONTENT ─────────────────────────────────── */
+
 .terminal-main {
   flex: 1;
   padding: 1.5rem;
@@ -321,7 +323,7 @@ html, body {
   font-size: 12px;
 }
 
-/* ─── GRID LAYOUTS ─────────────────────────────────── */
+
 .grid-2col {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -339,7 +341,7 @@ html, body {
   }
 }
 
-/* ─── PANELS ───────────────────────────────────────── */
+
 .terminal-panel {
   border: 1px solid var(--panel-border);
   background: var(--panel-bg);
@@ -371,7 +373,7 @@ html, body {
   padding: 0.75rem;
 }
 
-/* ─── PREDICCIONES & ANÁLISIS ──────────────────────── */
+
 .prediction-item {
   border-left: 2px solid var(--green-dim);
   padding: 0.6rem 0.75rem;
@@ -430,7 +432,7 @@ html, body {
   margin-bottom: 0.75rem;
 }
 
-/* ─── BADGE ────────────────────────────────────────── */
+
 .badge {
   display: inline-block;
   font-size: 9px;
@@ -444,7 +446,7 @@ html, body {
 .badge-mid    { border-color: var(--amber);       color: var(--amber); }
 .badge-low    { border-color: var(--green-dim);   color: var(--green-dim); }
 
-/* ─── LOADING ──────────────────────────────────────── */
+
 .loading-text {
   color: var(--green-dark);
   font-size: 12px;
@@ -483,38 +485,28 @@ html, body {
   100%  { text-shadow: 0 0 6px rgba(57,255,20,0.25); transform: translateX(0);    clip-path: none; }
 }
 
-/* ─── BOOT LOADER BAR ──────────────────────────────── */
+
 #boot-loader {
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 1.2rem;
   width: 100%;
   height: 100%;
   position: absolute;
   inset: 0;
-  padding: 2rem;
 }
 
-.boot-loader-label {
-  font-family: var(--font-display);
-  font-size: 2rem;
-  color: var(--green-bright);
-  letter-spacing: 4px;
-  text-shadow: 0 0 20px var(--green-glow);
-  animation: glow-pulse 1.5s ease-in-out infinite;
-}
-
-.boot-loader-bar-wrap {
+.boot-loader-outer {
   position: relative;
-  width: min(600px, 80vw);
-  height: 28px;
-  border: 1px solid var(--green-dim);
+  width: min(640px, 82vw);
+  height: 44px;
+  border: 2px solid var(--green-dim);
   background: #000;
-  box-shadow: 0 0 12px rgba(57,255,20,0.15), inset 0 0 8px rgba(0,0,0,0.8);
-  display: flex;
-  align-items: center;
+  box-shadow:
+    0 0 0 1px var(--green-dark),
+    0 0 20px rgba(57,255,20,0.15),
+    inset 0 0 12px rgba(0,0,0,0.9);
+  overflow: hidden;
 }
 
 .boot-loader-bar {
@@ -522,13 +514,15 @@ html, body {
   width: 0%;
   background: repeating-linear-gradient(
     90deg,
-    var(--green-bright) 0px,
-    var(--green-bright) 10px,
-    var(--green-mid) 10px,
-    var(--green-mid) 12px
+    var(--green-bright)  0px,
+    var(--green-bright)  7px,
+    var(--green-mid)     7px,
+    var(--green-mid)     8px,
+    transparent          8px,
+    transparent          10px
   );
-  box-shadow: 0 0 10px var(--green-glow);
-  transition: width 0.05s linear;
+  box-shadow: 2px 0 12px var(--green-glow);
+  transition: width 0.04s linear;
   position: relative;
 }
 
@@ -537,35 +531,34 @@ html, body {
   position: absolute;
   right: 0;
   top: 0;
-  width: 3px;
+  width: 2px;
   height: 100%;
-  background: white;
+  background: #fff;
   box-shadow: 0 0 8px var(--green-bright);
-  opacity: 0.8;
+  opacity: 0.9;
 }
 
-.boot-loader-pct {
+.boot-loader-pct-box {
   position: absolute;
-  right: 8px;
-  font-size: 13px;
-  color: var(--black);
-  font-family: var(--font-mono);
-  mix-blend-mode: difference;
-  filter: invert(1);
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  background: var(--black);
+  border: 1px solid var(--green-dim);
+  padding: 3px 14px;
+  z-index: 2;
   pointer-events: none;
-  z-index: 1;
 }
 
-.boot-loader-sub {
-  font-size: 11px;
-  color: var(--green-dim);
+.boot-loader-pct-box span {
+  font-family: var(--font-mono);
+  font-size: 15px;
+  color: var(--green-bright);
+  text-shadow: 0 0 10px var(--green-bright);
   letter-spacing: 3px;
-  min-height: 1.4em;
-  text-align: center;
-  animation: blink 1.2s step-end infinite;
 }
 
-/* ─── FOOTER ───────────────────────────────────────── */
+
 .terminal-footer {
   display: flex;
   justify-content: space-between;
@@ -577,7 +570,7 @@ html, body {
   letter-spacing: 1px;
 }
 
-/* ─── NAV HAMBURGER (mobile only) ─────────────────── */
+
 .nav-hamburger {
   display: none;
   background: transparent;
@@ -679,9 +672,11 @@ html, body {
   .boot-art { display: none; }
   .boot-terminal { border-left: none; padding: 0.75rem; }
   #boot-log { font-size: 11px; min-height: 120px; }
-  .boot-loader-label { font-size: 1.1rem; letter-spacing: 2px; text-align: center; }
-  .boot-loader-bar-wrap { width: 88vw; height: 20px; }
-  .boot-loader-sub { font-size: 9px; text-align: center; padding: 0 0.5rem; }
+  .boot-loader-outer { width: 88vw; height: 34px; }
+  .boot-loader-pct-box span { font-size: 12px; }
+  
+  
+  
 
   /* Footer */
   .terminal-footer {
@@ -742,7 +737,7 @@ html, body {
 ::-webkit-scrollbar-thumb { background: var(--green-dark); }
 ::-webkit-scrollbar-thumb:hover { background: var(--green-dim); }
 
-/* ─── KILL SCREEN ──────────────────────────────────── */
+
 #kill-screen {
   position: fixed;
   inset: 0;
@@ -826,10 +821,10 @@ html, body {
   50%       { opacity: 0.1; }
 }
 
-/* ─── UTILS ────────────────────────────────────────── */
+
 .hidden { display: none !important; }
 
-/* ─── CHAT ─────────────────────────────────────────── */
+
 .chat-panel-full {
   min-height: 400px;
 }

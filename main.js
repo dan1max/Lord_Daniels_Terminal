@@ -1,22 +1,18 @@
-// ═══════════════════════════════════════════════════
-// LORD DANIEL'S TERMINAL — MAIN JS
-// ═══════════════════════════════════════════════════
+// Property of dani.co
 
 var BOOT_LINES = [
-  '> INICIANDO LORD DANIEL\'S TERMINAL...',
-  '> VERIFICANDO INTEGRIDAD DEL SISTEMA... [OK]',
-  '> CARGANDO MÓDULOS DE ANÁLISIS POLÍTICO... [OK]',
-  '> CARGANDO MÓDULOS ECONÓMICOS... [OK]',
-  '> CARGANDO MÓDULOS GEOPOLÍTICOS... [OK]',
-  '> ESTABLECIENDO CONEXIÓN CON BASE DE DATOS... [OK]',
-  '> CARGANDO REGISTROS HISTÓRICOS...',
-  '> EJECUTANDO MODELOS PREDICTIVOS...',
-  '> CALIBRANDO ÍNDICES DE INESTABILIDAD...',
-  '> ADVERTENCIA: LOS DATOS SON ESTIMACIONES. EL FUTURO ES INCIERTO.',
-  '> DETECTOR DE POSICION ACTIVADO.',
+  '> SYSTEM CHECK... [OK]',
+  '> MEMORY INTEGRITY... [OK]',
+  '> POLITICAL ANALYSIS MODULE... [OK]',
+  '> ECONOMIC MODULE... [OK]',
+  '> GEOPOLITICAL MODULE... [OK]',
+  '> DATABASE CONNECTION... [OK]',
+  '> LOADING HISTORICAL RECORDS...',
+  '> RUNNING PREDICTIVE MODELS...',
+  '> CALIBRATING INSTABILITY INDEX...',
+  '> POSITION DETECTOR ACTIVE.',
   '',
-  '> SISTEMA LISTO.',
-  '> BIENVENIDO.',
+  '> SYSTEM READY.',
 ];
 
 async function runBootSequence() {
@@ -24,7 +20,7 @@ async function runBootSequence() {
   var bootScreen = document.getElementById('boot-screen');
 
   for (var i = 0; i < BOOT_LINES.length; i++) {
-    await sleep(i < 6 ? 120 : i < 11 ? 200 : 300);
+    await sleep(i < 6 ? 100 : i < 11 ? 180 : 260);
     var line = document.createElement('span');
     line.className = 'log-line';
     line.textContent = BOOT_LINES[i];
@@ -32,54 +28,39 @@ async function runBootSequence() {
     log.scrollTop = log.scrollHeight;
   }
 
-  await sleep(600);
-
+  await sleep(500);
   var bootContent = document.querySelector('.boot-content');
-  bootContent.style.transition = 'opacity 0.6s ease';
+  bootContent.style.transition = 'opacity 0.5s ease';
   bootContent.style.opacity = '0';
-  await sleep(700);
+  await sleep(600);
   bootContent.style.display = 'none';
 
   bootScreen.insertAdjacentHTML('beforeend',
     '<div id="boot-loader">' +
-      '<div class="boot-loader-label">INICIANDO SISTEMA...</div>' +
-      '<div class="boot-loader-bar-wrap">' +
+      '<div class="boot-loader-outer">' +
         '<div class="boot-loader-bar" id="boot-bar"></div>' +
-        '<span class="boot-loader-pct" id="boot-pct">0%</span>' +
+        '<div class="boot-loader-pct-box">' +
+          '<span id="boot-pct">0%</span>' +
+        '</div>' +
       '</div>' +
-      '<div class="boot-loader-sub" id="boot-sub">CARGANDO MÓDULOS</div>' +
     '</div>'
   );
   bootScreen.style.opacity = '1';
 
   var bar = document.getElementById('boot-bar');
   var pct = document.getElementById('boot-pct');
-  var sub = document.getElementById('boot-sub');
-
-  var stages = [
-    { target: 18,  label: 'CARGANDO MÓDULOS DE ANÁLISIS...',     delay: 30 },
-    { target: 35,  label: 'VERIFICANDO BASE DE DATOS...',         delay: 25 },
-    { target: 52,  label: 'CALIBRANDO ÍNDICES ECONÓMICOS...',     delay: 20 },
-    { target: 67,  label: 'SINCRONIZANDO DATOS GEOPOLÍTICOS...',  delay: 22 },
-    { target: 81,  label: 'COMPILANDO MODELOS PREDICTIVOS...',    delay: 18 },
-    { target: 93,  label: 'APLICANDO PROTOCOLOS DE SEGURIDAD...', delay: 28 },
-    { target: 100, label: 'SISTEMA LISTO.',                       delay: 15 },
-  ];
-
   var current = 0;
-  for (var s = 0; s < stages.length; s++) {
-    var stage = stages[s];
-    sub.textContent = stage.label;
-    while (current < stage.target) {
-      current++;
-      bar.style.width = current + '%';
-      pct.textContent = current + '%';
-      await sleep(stage.delay);
-    }
-    await sleep(180);
+
+  while (current < 100) {
+    current++;
+    bar.style.width = current + '%';
+    pct.textContent = current + '%';
+    var delay = Math.max(4, Math.round(80 * Math.pow(1 - current / 100, 2.2)));
+    await sleep(delay);
+    if (current === 33 || current === 66) { await sleep(120); }
   }
 
-  await sleep(600);
+  await sleep(400);
   bootScreen.classList.add('fade-out');
   await sleep(900);
   bootScreen.style.display = 'none';
@@ -89,14 +70,13 @@ async function runBootSequence() {
 
   initTerminal();
   initChat();
-  initKillSwitch();
+  initRealtimeConfig();
 }
 
 function sleep(ms) {
   return new Promise(function(resolve) { setTimeout(resolve, ms); });
 }
 
-// ─── INIT TERMINAL ──────────────────────────────────
 async function initTerminal() {
   updateClock();
   setInterval(updateClock, 1000);
@@ -109,11 +89,10 @@ async function initTerminal() {
   if (lastUpdate) {
     var d = new Date(lastUpdate);
     document.getElementById('footer-last-update').textContent =
-      'ÚLTIMA ACTUALIZACIÓN: ' + d.toLocaleDateString('es-ES').toUpperCase();
+      'LAST UPDATE: ' + d.toLocaleDateString('es-ES').toUpperCase();
   }
 }
 
-// ─── CLOCK ──────────────────────────────────────────
 function updateClock() {
   var now = new Date();
   var dateStr = now.toLocaleDateString('es-ES', {
@@ -122,7 +101,6 @@ function updateClock() {
   document.getElementById('header-date').textContent = dateStr + ' ' + now.toLocaleTimeString('es-ES');
 }
 
-// ─── NAVIGATION ─────────────────────────────────────
 var hamburger = document.getElementById('nav-hamburger');
 var navItems  = document.getElementById('nav-items');
 
@@ -130,7 +108,7 @@ if (hamburger && navItems) {
   hamburger.addEventListener('click', function() {
     var isOpen = navItems.classList.toggle('open');
     hamburger.classList.toggle('open', isOpen);
-    hamburger.textContent = isOpen ? '[ MENÚ ▲ ]' : '[ MENÚ ▼ ]';
+    hamburger.textContent = isOpen ? '[ MENU ▲ ]' : '[ MENU ▼ ]';
   });
 }
 
@@ -141,13 +119,11 @@ document.querySelectorAll('.nav-btn[data-section]').forEach(function(btn) {
     document.getElementById('section-' + target).classList.remove('hidden');
     document.querySelectorAll('.nav-btn[data-section]').forEach(function(b) { b.classList.remove('active'); });
     btn.classList.add('active');
-    // Close mobile menu on section select
     if (navItems) { navItems.classList.remove('open'); }
-    if (hamburger) { hamburger.classList.remove('open'); hamburger.textContent = '[ MENÚ ▼ ]'; }
+    if (hamburger) { hamburger.classList.remove('open'); hamburger.textContent = '[ MENU ▼ ]'; }
   });
 });
 
-// ─── LOAD SECTION CONTENT ───────────────────────────
 async function loadSectionContent(seccion) {
   var predicciones = await fetchPredicciones(seccion);
   var predContainer = document.getElementById(seccion + '-predicciones');
@@ -156,7 +132,6 @@ async function loadSectionContent(seccion) {
       ? noSignalHTML()
       : predicciones.map(renderPrediccion).join('');
   }
-
   var analisis = await fetchAnalisis(seccion);
   var analContainer = document.getElementById(seccion + '-analisis');
   if (analContainer) {
@@ -164,7 +139,6 @@ async function loadSectionContent(seccion) {
   }
 }
 
-// ─── RENDER HELPERS ─────────────────────────────────
 function renderPrediccion(p) {
   var prob = p.probabilidad || '';
   var riesgo = p.riesgo || 'low';
@@ -174,7 +148,6 @@ function renderPrediccion(p) {
   var tags = p.tags ? p.tags.split(',').map(function(t) {
     return '<span class="badge badge-low">' + t.trim().toUpperCase() + '</span>';
   }).join('') : '';
-
   return '<div class="prediction-item">' +
     '<div class="prediction-title">' +
       '<span class="prediction-label">' + escHtml(p.titulo) + '</span>' +
@@ -182,7 +155,7 @@ function renderPrediccion(p) {
     '</div>' +
     '<div><span class="badge ' + badgeClass + '">' + riesgoLabel + '</span>' + tags + '</div>' +
     '<div class="prediction-text">' + escHtml(p.descripcion || '') + '</div>' +
-    (fecha ? '<div class="prediction-date">HORIZONTE: ' + fecha.toUpperCase() + '</div>' : '') +
+    (fecha ? '<div class="prediction-date">HORIZON: ' + fecha.toUpperCase() + '</div>' : '') +
   '</div>';
 }
 
@@ -209,50 +182,73 @@ function escHtml(str) {
   return div.innerHTML;
 }
 
-// ─── START ───────────────────────────────────────────
+// Property of dani.co
+
 window.addEventListener('DOMContentLoaded', async function() {
   var siteActivo = await getSiteActivo();
   if (!siteActivo) {
-    var ks = document.getElementById('kill-screen');
-    if (ks) { ks.classList.remove('hidden'); }
-    var ns = document.getElementById('kill-no-signal-text');
-    if (ns) {
-      ns.style.animationDuration = (10 + Math.floor(Math.random() * 5)) + 's';
-      ns.style.animationDelay = '-' + (Math.random() * 14).toFixed(2) + 's';
-    }
-    // Sigue escuchando por si el admin reactiva el sitio
-    suscribirConfig(function(payload) {
-      if (payload.new && payload.new.clave === 'site_activo') {
-        if (payload.new.valor !== 'false') { location.reload(); }
-      }
-    });
+    showKillScreen();
+    supabaseClient.channel('site-watch')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'config' }, function(payload) {
+        if (payload.new && payload.new.clave === 'site_activo' && payload.new.valor !== 'false') {
+          location.reload();
+        }
+      })
+      .subscribe();
     return;
   }
   runBootSequence();
 });
 
-// ═══════════════════════════════════════════════════
-// CHAT
-// ═══════════════════════════════════════════════════
-
 var chatActivo = false;
+
+function initRealtimeConfig() {
+  supabaseClient.channel('config-unified')
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'config' }, function(payload) {
+      if (!payload.new) { return; }
+      var key = payload.new.clave;
+      var val = payload.new.valor;
+
+      if (key === 'chat_activo') {
+        chatActivo = val === 'true';
+        renderChatEstado();
+        if (chatActivo) { cargarMensajes(); }
+      }
+
+      if (key === 'site_activo') {
+        if (val === 'false') { showKillScreen(); }
+        else { hideKillScreen(); }
+      }
+    })
+    .subscribe();
+}
+
+function showKillScreen() {
+  var ks = document.getElementById('kill-screen');
+  if (!ks) { return; }
+  ks.classList.remove('hidden');
+  var ns = document.getElementById('kill-no-signal-text');
+  if (ns) {
+    ns.style.animationDuration = (10 + Math.floor(Math.random() * 5)) + 's';
+    ns.style.animationDelay = '-' + (Math.random() * 14).toFixed(2) + 's';
+  }
+}
+
+function hideKillScreen() {
+  var ks = document.getElementById('kill-screen');
+  if (ks) { ks.classList.add('hidden'); }
+}
 
 async function initChat() {
   chatActivo = await getChatActivo();
   renderChatEstado();
   if (chatActivo) { await cargarMensajes(); }
 
-  suscribirMensajes(function(payload) {
-    if (chatActivo) { appendMensaje(payload.new); }
-  });
-
-  suscribirConfig(function(payload) {
-    if (payload.new && payload.new.clave === 'chat_activo') {
-      chatActivo = payload.new.valor === 'true';
-      renderChatEstado();
-      if (chatActivo) { cargarMensajes(); }
-    }
-  });
+  supabaseClient.channel('mensajes-live')
+    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'mensajes' }, function(payload) {
+      if (chatActivo) { appendMensaje(payload.new); }
+    })
+    .subscribe();
 
   var sendBtn  = document.getElementById('chat-send');
   var msgInput = document.getElementById('chat-msg');
@@ -293,7 +289,7 @@ function appendMensaje(m, doScroll) {
   if (!container) { return; }
   var hora  = new Date(m.created_at).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
   var tipo  = m.es_admin ? 'admin' : 'visitor';
-  var alias = m.es_admin ? '[ OPERADOR ]' : (m.alias || 'ANON').toUpperCase();
+  var alias = m.es_admin ? '[ OPERATOR ]' : (m.alias || 'ANON').toUpperCase();
   var div = document.createElement('div');
   div.className = 'chat-msg ' + tipo;
   div.innerHTML =
@@ -323,36 +319,4 @@ async function enviarMensaje() {
   await insertMensaje(alias, texto, false);
   if (sendBtn) { sendBtn.disabled = false; }
   if (msgEl)   { msgEl.focus(); }
-}
-
-// ═══════════════════════════════════════════════════
-// KILL SWITCH
-// ═══════════════════════════════════════════════════
-
-async function initKillSwitch() {
-  var siteActivo = await getSiteActivo();
-  renderKillScreen(!siteActivo);
-
-  // Realtime: escucha cambios de site_activo
-  suscribirConfig(function(payload) {
-    if (payload.new && payload.new.clave === 'site_activo') {
-      renderKillScreen(payload.new.valor === 'false');
-    }
-  });
-}
-
-function renderKillScreen(mostrar) {
-  var ks = document.getElementById('kill-screen');
-  if (!ks) { return; }
-  if (mostrar) {
-    ks.classList.remove('hidden');
-    // Animación desincronizada
-    var ns = document.getElementById('kill-no-signal-text');
-    if (ns) {
-      ns.style.animationDuration = (10 + Math.floor(Math.random() * 5)) + 's';
-      ns.style.animationDelay = '-' + (Math.random() * 14).toFixed(2) + 's';
-    }
-  } else {
-    ks.classList.add('hidden');
-  }
 }

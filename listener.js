@@ -25,6 +25,7 @@ async function initListener() {
 function joinBroadcast() {
   broadcastWasActive = true;
   showBroadcastWidget(true);
+  showMrHouseOverlay(true);
 
   listenerChannel = supabaseClient.channel(SIGNAL_CH, { config: { broadcast: { self: false } } });
 
@@ -83,6 +84,7 @@ function leavebroadcast() {
   if (listenerPc) { listenerPc.close(); listenerPc = null; }
   if (listenerChannel) { supabaseClient.removeChannel(listenerChannel); listenerChannel = null; }
   showBroadcastWidget(false);
+  showMrHouseOverlay(false);
 }
 
 function showBroadcastWidget(show) {
@@ -94,5 +96,20 @@ function showBroadcastWidget(show) {
     widget.classList.add('hidden');
     var audio = document.getElementById('broadcast-audio');
     if (audio) { audio.srcObject = null; }
+  }
+}
+
+function showMrHouseOverlay(show) {
+  var overlay = document.getElementById('mr-house-overlay');
+  if (!overlay) { return; }
+  if (show) {
+    overlay.classList.remove('hidden');
+    var img = document.getElementById('mr-house-img');
+    if (img) {
+      img.style.animationDuration = (10 + Math.floor(Math.random() * 5)) + 's';
+      img.style.animationDelay = '-' + (Math.random() * 8).toFixed(2) + 's';
+    }
+  } else {
+    overlay.classList.add('hidden');
   }
 }

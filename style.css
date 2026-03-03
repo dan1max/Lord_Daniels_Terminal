@@ -498,8 +498,8 @@ html, body {
 
 .boot-loader-outer {
   position: relative;
-  width: min(640px, 82vw);
-  height: 44px;
+  width: min(420px, 70vw);
+  height: 72px;
   border: 2px solid var(--green-dim);
   background: #000;
   box-shadow:
@@ -515,11 +515,11 @@ html, body {
   background: repeating-linear-gradient(
     90deg,
     var(--green-bright)  0px,
-    var(--green-bright)  7px,
-    var(--green-mid)     7px,
-    var(--green-mid)     8px,
-    transparent          8px,
-    transparent          10px
+    var(--green-bright)  9px,
+    var(--green-mid)     9px,
+    var(--green-mid)     11px,
+    transparent          11px,
+    transparent          14px
   );
   box-shadow: 2px 0 12px var(--green-glow);
   transition: width 0.04s linear;
@@ -545,17 +545,17 @@ html, body {
   transform: translate(-50%, -50%);
   background: var(--black);
   border: 1px solid var(--green-dim);
-  padding: 3px 14px;
+  padding: 6px 18px;
   z-index: 2;
   pointer-events: none;
 }
 
 .boot-loader-pct-box span {
   font-family: var(--font-mono);
-  font-size: 15px;
+  font-size: 20px;
   color: var(--green-bright);
-  text-shadow: 0 0 10px var(--green-bright);
-  letter-spacing: 3px;
+  text-shadow: 0 0 12px var(--green-bright);
+  letter-spacing: 4px;
 }
 
 
@@ -672,7 +672,7 @@ html, body {
   .boot-art { display: none; }
   .boot-terminal { border-left: none; padding: 0.75rem; }
   #boot-log { font-size: 11px; min-height: 120px; }
-  .boot-loader-outer { width: 88vw; height: 34px; }
+  .boot-loader-outer { width: 88vw; height: 54px; }
   .boot-loader-pct-box span { font-size: 12px; }
   
   
@@ -1301,4 +1301,64 @@ html, body {
   min-height: 1.2em;
   margin-top: 0.5rem;
   letter-spacing: 1px;
+}
+
+.broadcast-widget {
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  z-index: 500;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  background: var(--panel-bg);
+  border: 1px solid var(--amber);
+  padding: 0.5rem 1rem;
+  box-shadow: 0 0 20px rgba(255,176,0,0.2);
+  animation: section-in 0.3s ease;
+}
+
+.broadcast-widget.hidden { display: none !important; }
+
+.broadcast-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--green-dark);
+  flex-shrink: 0;
+}
+
+.broadcast-dot.on {
+  background: var(--amber);
+  box-shadow: 0 0 8px var(--amber);
+  animation: status-pulse 1.5s ease-in-out infinite;
+}
+
+.broadcast-label-text {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--amber);
+  letter-spacing: 3px;
+}
+
+.broadcast-unmute {
+  background: transparent;
+  border: 1px solid var(--amber);
+  color: var(--amber);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  padding: 0.2rem 0.5rem;
+  cursor: pointer;
+  letter-spacing: 1px;
+}
+
+.broadcast-unmute:hover { background: rgba(255,176,0,0.1); }
+
+@media (max-width: 768px) {
+  .broadcast-widget {
+    bottom: 0.75rem;
+    right: 0.75rem;
+    padding: 0.4rem 0.75rem;
+  }
+  .broadcast-label-text { font-size: 10px; letter-spacing: 2px; }
 }

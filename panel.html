@@ -74,6 +74,7 @@
       <button class="nav-btn active" data-tab="predicciones">[ PREDICCIONES ]</button>
       <button class="nav-btn" data-tab="analisis">[ ANÁLISIS ]</button>
       <button class="nav-btn" data-tab="chat">[ CHAT ]</button>
+      <button class="nav-btn" data-tab="broadcast">[ BROADCAST ]</button>
     </div>
 
     <!-- TAB: PREDICCIONES -->
@@ -224,10 +225,36 @@ Segundo párrafo del análisis..."></textarea>
       </div>
     </div>
 
+
+    <!-- TAB: BROADCAST -->
+    <div id="tab-broadcast" class="admin-tab" style="display:none;">
+      <div style="max-width: 700px; display:flex; flex-direction:column; gap:1.5rem;">
+
+        <div class="admin-panel" style="border-color:var(--amber);">
+          <div class="admin-panel-header" style="color:var(--amber);">▶ LIVE AUDIO BROADCAST</div>
+          <div class="admin-panel-body" style="display:flex;flex-direction:column;gap:1rem;">
+            <div style="display:flex;align-items:center;gap:1.5rem;flex-wrap:wrap;">
+              <button id="btn-broadcast" class="toggle-btn-on">[ START BROADCAST ]</button>
+              <div>
+                <div id="broadcast-label" class="chat-toggle-status off">BROADCAST OFFLINE</div>
+                <div style="font-size:10px;color:var(--green-dark);letter-spacing:1px;margin-top:4px;">Visitors will hear your microphone in real time</div>
+              </div>
+            </div>
+            <div id="broadcast-listeners" style="display:none;font-size:11px;color:var(--green-dim);letter-spacing:2px;"></div>
+            <div style="font-size:9px;color:var(--green-dark);letter-spacing:1px;border-top:1px solid var(--green-dark);padding-top:0.75rem;">
+              REQUIRES MICROPHONE PERMISSION · WORKS BEST ON CHROME/EDGE · MAX ~30 SIMULTANEOUS LISTENERS
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
   </div><!-- /admin-view -->
 
   <script src="supabase.js"></script>
   <script src="auth.js"></script>
   <script src="admin.js"></script>
+  <script src="broadcast.js"></script>
 </body>
 </html>

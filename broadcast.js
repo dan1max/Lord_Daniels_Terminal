@@ -25,7 +25,15 @@ async function initBroadcastAdmin() {
 
 async function startBroadcast() {
   try {
-    micStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+    micStream = await navigator.mediaDevices.getUserMedia({
+      audio: {
+        echoCancellation: true,
+        noiseSuppression: true,
+        autoGainControl: true,
+        channelCount: 1
+      },
+      video: false
+    });
   } catch (e) {
     showAlert('> MICROPHONE ACCESS DENIED: ' + e.message, 'error');
     return;
@@ -144,6 +152,45 @@ function applyRadioEffect(stream) {
   audioCtx = new (window.AudioContext || window.webkitAudioContext)();
   var source = audioCtx.createMediaStreamSource(stream);
 
+  // Noise gate: silences signal below threshold, prevents background bleed
+  var gateAnalyser = audioCtx.createAnalyser();
+  gateAnalyser.fftSize = 512;
+  var gateBuffer = new Float32Array(gateAnalyser.fftSize);
+  var gateGain = audioCtx.createGain();
+  gateGain.gain.value = 1;
+  var GATE_THRESHOLD = 0.015; // 0.0 - 1.0, raise if still too sensitive
+  var GATE_ATTACK  = 0.008;
+  var GATE_RELEASE = 0.15;
+  var gateOpen = false;
+  var gateReleaseTimer = null;
+
+  function tickGate() {
+    gateAnalyser.getFloatTimeDomainData(gateBuffer);
+    var rms = 0;
+    for (var i = 0; i < gateBuffer.length; i++) { rms += gateBuffer[i] * gateBuffer[i]; }
+    rms = Math.sqrt(rms / gateBuffer.length);
+
+    if (rms > GATE_THRESHOLD) {
+      if (!gateOpen) {
+        gateOpen = true;
+        gateGain.gain.cancelScheduledValues(audioCtx.currentTime);
+        gateGain.gain.setTargetAtTime(1, audioCtx.currentTime, GATE_ATTACK);
+      }
+      if (gateReleaseTimer) { clearTimeout(gateReleaseTimer); gateReleaseTimer = null; }
+    } else {
+      if (gateOpen && !gateReleaseTimer) {
+        gateReleaseTimer = setTimeout(function() {
+          gateOpen = false;
+          gateGain.gain.cancelScheduledValues(audioCtx.currentTime);
+          gateGain.gain.setTargetAtTime(0, audioCtx.currentTime, GATE_RELEASE);
+          gateReleaseTimer = null;
+        }, 80);
+      }
+    }
+    if (audioCtx && audioCtx.state !== 'closed') { requestAnimationFrame(tickGate); }
+  }
+  tickGate();
+
   // 1. High-pass: strip everything below 280Hz (no warmth, no body)
   var hipass = audioCtx.createBiquadFilter();
   hipass.type = 'highpass';
@@ -199,7 +246,9 @@ function applyRadioEffect(stream) {
   var dest = audioCtx.createMediaStreamDestination();
 
   // Main chain: source → hipass → lopass → bandMid → bandPres → distortion → compressor → gain
-  source.connect(hipass);
+  source.connect(gateAnalyser);
+  gateAnalyser.connect(gateGain);
+  gateGain.connect(hipass);
   hipass.connect(lopass);
   lopass.connect(bandMid);
   bandMid.connect(bandPres);

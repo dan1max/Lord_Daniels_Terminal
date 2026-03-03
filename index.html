@@ -197,6 +197,14 @@
         </div>
       </section>
 
+    <!-- BROADCAST WIDGET -->
+    <div id="broadcast-widget" class="broadcast-widget hidden">
+      <div class="broadcast-dot" id="broadcast-dot"></div>
+      <span class="broadcast-label-text">LIVE AUDIO</span>
+      <audio id="broadcast-audio" autoplay></audio>
+      <button id="broadcast-unmute" class="broadcast-unmute" style="display:none;" onclick="document.getElementById('broadcast-audio').play();this.style.display='none'">[ TAP TO UNMUTE ]</button>
+    </div>
+
     </main>
     <footer class="terminal-footer">
       <span>LORD DANIEL'S TERMINAL © 2024</span>
@@ -209,5 +217,6 @@
   <script src="supabase.js"></script>
   <script src="charts.js"></script>
   <script src="main.js"></script>
+  <script src="listener.js"></script>
 </body>
 </html>

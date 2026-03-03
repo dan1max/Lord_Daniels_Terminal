@@ -109,7 +109,32 @@ function showMrHouseOverlay(show) {
       img.style.animationDuration = (10 + Math.floor(Math.random() * 5)) + 's';
       img.style.animationDelay = '-' + (Math.random() * 8).toFixed(2) + 's';
     }
+    initMrHouseCmd();
   } else {
     overlay.classList.add('hidden');
   }
+}
+
+var _mrCmdInit = false;
+function initMrHouseCmd() {
+  if (_mrCmdInit) { return; }
+  _mrCmdInit = true;
+
+  var sendBtn  = document.getElementById('mr-house-send');
+  var msgInput = document.getElementById('mr-house-msg');
+
+  function enviar() {
+    var alias = (document.getElementById('mr-house-alias').value.trim() || 'ANON').toUpperCase();
+    var texto = msgInput.value.trim();
+    if (!texto) { return; }
+    msgInput.value = '';
+    sendBtn.disabled = true;
+    insertMensaje(alias, texto, false).then(function() {
+      sendBtn.disabled = false;
+      msgInput.focus();
+    });
+  }
+
+  if (sendBtn)  { sendBtn.addEventListener('click', enviar); }
+  if (msgInput) { msgInput.addEventListener('keydown', function(e) { if (e.key === 'Enter') { enviar(); } }); }
 }

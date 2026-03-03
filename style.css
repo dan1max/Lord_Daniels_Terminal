@@ -1362,3 +1362,72 @@ html, body {
   }
   .broadcast-label-text { font-size: 10px; letter-spacing: 2px; }
 }
+
+#mr-house-overlay {
+  position: fixed;
+  inset: 0;
+  background: #000;
+  z-index: 9990;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#mr-house-overlay.hidden { display: none !important; }
+
+.mr-house-scanlines {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0,0,0,0.4) 3px
+  );
+  z-index: 1;
+}
+
+.mr-house-vignette {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(ellipse at center, transparent 35%, rgba(0,0,0,0.95) 100%);
+  z-index: 2;
+}
+
+.mr-house-content {
+  position: relative;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.mr-house-img {
+  width: clamp(260px, 40vw, 560px);
+  height: auto;
+  filter:
+    saturate(0)
+    sepia(1)
+    hue-rotate(70deg)
+    saturate(3)
+    brightness(0.85)
+    contrast(1.1);
+  animation: mr-house-glitch 1s steps(1) infinite;
+  display: block;
+}
+
+@keyframes mr-house-glitch {
+  0%   { transform: translateX(0);    clip-path: none;               filter: saturate(0) sepia(1) hue-rotate(70deg) saturate(3) brightness(0.85) contrast(1.1); }
+  2%   { transform: translateX(-4px); clip-path: inset(12% 0 75% 0); filter: saturate(0) sepia(1) hue-rotate(70deg) saturate(4) brightness(1.1)  contrast(1.3); }
+  3%   { transform: translateX(4px);  clip-path: inset(60% 0 18% 0); filter: saturate(0) sepia(1) hue-rotate(75deg) saturate(3) brightness(0.8)  contrast(1.2); }
+  4%   { transform: translateX(-2px); clip-path: inset(30% 0 50% 0); filter: saturate(0) sepia(1) hue-rotate(68deg) saturate(3) brightness(0.9)  contrast(1.1); }
+  5%   { transform: translateX(0);    clip-path: none;               filter: saturate(0) sepia(1) hue-rotate(70deg) saturate(3) brightness(0.85) contrast(1.1); }
+  100% { transform: translateX(0);    clip-path: none;               filter: saturate(0) sepia(1) hue-rotate(70deg) saturate(3) brightness(0.85) contrast(1.1); }
+}
+
+@media (max-width: 768px) {
+  .mr-house-img { width: clamp(200px, 80vw, 360px); }
+  }

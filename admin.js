@@ -1,8 +1,5 @@
-// ═══════════════════════════════════════════════════
-// LORD DANIEL'S TERMINAL — ADMIN JS
-// ═══════════════════════════════════════════════════
+// Property of dani.co
 
-// ─── AUTH CHECK ───────────────────────────────────────
 window.addEventListener('DOMContentLoaded', async () => {
   const session = await getSession();
   if (session) {
@@ -13,7 +10,6 @@ window.addEventListener('DOMContentLoaded', async () => {
   }
 });
 
-// ─── LOGIN ─────────────────────────────────────────────
 document.getElementById('btn-login').addEventListener('click', async () => {
   const email    = document.getElementById('login-email').value.trim();
   const password = document.getElementById('login-password').value;
@@ -39,13 +35,11 @@ document.getElementById('login-password').addEventListener('keydown', e => {
   if (e.key === 'Enter') document.getElementById('btn-login').click();
 });
 
-// ─── LOGOUT ────────────────────────────────────────────
 document.getElementById('btn-logout').addEventListener('click', async () => {
   await signOut();
   location.reload();
 });
 
-// ─── SHOW ADMIN ────────────────────────────────────────
 function showAdmin() {
   document.getElementById('login-view').style.display = 'none';
   document.getElementById('admin-view').style.display = 'block';
@@ -53,7 +47,6 @@ function showAdmin() {
   initKillSwitchAdmin();
 }
 
-// ─── TABS ──────────────────────────────────────────────
 document.querySelectorAll('[data-tab]').forEach(btn => {
   btn.addEventListener('click', () => {
     document.querySelectorAll('.admin-tab').forEach(t => t.style.display = 'none');
@@ -63,7 +56,6 @@ document.querySelectorAll('[data-tab]').forEach(btn => {
   });
 });
 
-// ─── ALERT HELPER ──────────────────────────────────────
 function showAlert(msg, type = 'success') {
   const el = document.getElementById('admin-alert');
   el.className = `alert alert-${type}`;
@@ -72,11 +64,8 @@ function showAlert(msg, type = 'success') {
   setTimeout(() => el.style.display = 'none', 3000);
 }
 
-// ════════════════════════════════════════════════════
 // PREDICCIONES
-// ════════════════════════════════════════════════════
 
-// ─── LOAD LIST ─────────────────────────────────────────
 async function loadPredList() {
   const seccion = document.getElementById('filter-seccion').value;
   const listEl = document.getElementById('pred-list');
@@ -104,7 +93,6 @@ async function loadPredList() {
 
 document.getElementById('filter-seccion').addEventListener('change', loadPredList);
 
-// ─── SAVE ──────────────────────────────────────────────
 document.getElementById('btn-save-pred').addEventListener('click', async () => {
   const id = document.getElementById('pred-id').value;
   const payload = {
@@ -139,7 +127,6 @@ document.getElementById('btn-save-pred').addEventListener('click', async () => {
   }
 });
 
-// ─── EDIT ──────────────────────────────────────────────
 async function editPred(id) {
   const { data } = await supabaseClient
     .from('predicciones')
@@ -159,7 +146,6 @@ async function editPred(id) {
   document.getElementById('pred-tags').value         = data.tags || '';
 }
 
-// ─── DELETE ────────────────────────────────────────────
 async function deletePred(id) {
   if (!confirm('¿Eliminar esta predicción?')) return;
   const { error } = await deletePrediccion(id);
@@ -171,7 +157,6 @@ async function deletePred(id) {
   }
 }
 
-// ─── CLEAR FORM ────────────────────────────────────────
 document.getElementById('btn-clear-pred').addEventListener('click', clearPredForm);
 
 function clearPredForm() {
@@ -184,9 +169,7 @@ function clearPredForm() {
   document.getElementById('pred-tags').value        = '';
 }
 
-// ════════════════════════════════════════════════════
 // ANÁLISIS
-// ════════════════════════════════════════════════════
 
 document.getElementById('btn-load-analisis').addEventListener('click', async () => {
   const seccion = document.getElementById('analisis-seccion').value;
@@ -217,20 +200,20 @@ document.getElementById('btn-save-analisis').addEventListener('click', async () 
   }
 });
 
-// ─── UTILS ─────────────────────────────────────────────
 function escHtml(str) {
   const div = document.createElement('div');
   div.textContent = str;
   return div.innerHTML;
 }
 
-// ════════════════════════════════════════════════════
 // CHAT ADMIN
-// ════════════════════════════════════════════════════
 
 let adminChatActivo = false;
 
+var _adminChatInit = false;
 async function initAdminChat() {
+  if (_adminChatInit) { return; }
+  _adminChatInit = true;
   adminChatActivo = await getChatActivo();
   renderToggleUI();
   await cargarAdminMensajes();
@@ -305,7 +288,7 @@ function appendAdminMensaje(m, doScroll = true) {
 
   const hora  = new Date(m.created_at).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
   const tipo  = m.es_admin ? 'admin' : 'visitor';
-  const alias = m.es_admin ? '[ OPERADOR ]' : (m.alias || 'ANON').toUpperCase();
+  const alias = m.es_admin ? '[ LD ]' : (m.alias || 'ANON').toUpperCase();
 
   const div = document.createElement('div');
   div.className = `chat-msg ${tipo}`;
@@ -332,7 +315,7 @@ async function enviarRespuestaAdmin() {
   if (!texto) return;
 
   document.getElementById('admin-chat-msg').value = '';
-  const { error } = await insertMensaje('OPERADOR', texto, true);
+  const { error } = await insertMensaje('LD', texto, true);
   if (error) showAlert('> ERROR AL ENVIAR: ' + error.message, 'error');
 }
 
@@ -349,9 +332,7 @@ document.querySelectorAll('[data-tab]').forEach(btn => {
   }
 });
 
-// ════════════════════════════════════════════════════
 // KILL SWITCH ADMIN
-// ════════════════════════════════════════════════════
 
 var siteActivo = true;
 

@@ -71,6 +71,7 @@ async function runBootSequence() {
   initTerminal();
   initChat();
   initRealtimeConfig();
+  initListener();
 }
 
 function sleep(ms) {

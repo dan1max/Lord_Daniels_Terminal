@@ -45,6 +45,7 @@ function showAdmin() {
   document.getElementById('admin-view').style.display = 'block';
   loadPredList();
   initKillSwitchAdmin();
+  initBroadcastAdmin();
 }
 
 document.querySelectorAll('[data-tab]').forEach(btn => {

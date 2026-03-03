@@ -147,13 +147,13 @@ function applyRadioEffect(stream) {
   // 1. High-pass: strip everything below 280Hz (no warmth, no body)
   var hipass = audioCtx.createBiquadFilter();
   hipass.type = 'highpass';
-  hipass.frequency.value = 280;
+  hipass.frequency.value = 200;
   hipass.Q.value = 0.8;
 
   // 2. Low-pass: hard ceiling at 3kHz — old CRT speaker can't reproduce highs
   var lopass = audioCtx.createBiquadFilter();
   lopass.type = 'lowpass';
-  lopass.frequency.value = 3000;
+  lopass.frequency.value = 3800;
   lopass.Q.value = 0.7;
 
   // 3. Bandpass A: boost boxy midrange around 800Hz (the "talking through a metal box" quality)
@@ -161,18 +161,18 @@ function applyRadioEffect(stream) {
   bandMid.type = 'peaking';
   bandMid.frequency.value = 800;
   bandMid.Q.value = 1.2;
-  bandMid.gain.value = 7;
+  bandMid.gain.value = 4;
 
   // 4. Bandpass B: slight presence boost around 1.8kHz for intelligibility
   var bandPres = audioCtx.createBiquadFilter();
   bandPres.type = 'peaking';
   bandPres.frequency.value = 1800;
   bandPres.Q.value = 1.0;
-  bandPres.gain.value = 4;
+  bandPres.gain.value = 3;
 
   // 5. Heavy distortion/saturation — Mr House has real grit
   var distortion = audioCtx.createWaveShaper();
-  distortion.curve = makeDistortionCurve(130);
+  distortion.curve = makeDistortionCurve(40);
   distortion.oversample = '4x';
 
   // 6. Speaker box resonance: very short feedback delay (2.5ms) simulates
@@ -180,21 +180,21 @@ function applyRadioEffect(stream) {
   var delayNode = audioCtx.createDelay();
   delayNode.delayTime.value = 0.0025;
   var delayFeedback = audioCtx.createGain();
-  delayFeedback.gain.value = 0.18;
+  delayFeedback.gain.value = 0.10;
   var delayMix = audioCtx.createGain();
-  delayMix.gain.value = 0.22;
+  delayMix.gain.value = 0.12;
 
   // 7. Compressor: heavy limiting, like a broadcast compander
   var compressor = audioCtx.createDynamicsCompressor();
-  compressor.threshold.value = -18;
+  compressor.threshold.value = -22;
   compressor.knee.value = 4;
-  compressor.ratio.value = 10;
+  compressor.ratio.value = 6;
   compressor.attack.value = 0.001;
   compressor.release.value = 0.08;
 
   // 8. Output gain
   var gain = audioCtx.createGain();
-  gain.gain.value = 2.2;
+  gain.gain.value = 1.6;
 
   var dest = audioCtx.createMediaStreamDestination();
 
@@ -219,7 +219,7 @@ function applyRadioEffect(stream) {
 }
 
 function makeDistortionCurve(amount) {
-  var samples = 512;
+  var samples = 256;
   var curve = new Float32Array(samples);
   for (var i = 0; i < samples; i++) {
     var x = (i * 2) / samples - 1;

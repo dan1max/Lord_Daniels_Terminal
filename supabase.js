@@ -228,3 +228,26 @@ async function setSiteActivo(activo) {
     return supabaseClient.from('config').insert([{ clave: 'site_activo', valor: String(activo) }]);
   }
 }
+
+async function getBroadcastActivo() {
+  var result = await supabaseClient
+    .from('config')
+    .select('valor')
+    .eq('clave', 'broadcast_activo')
+    .single();
+  if (!result.data) { return false; }
+  return result.data.valor === 'true';
+}
+
+async function setBroadcastActivo(activo) {
+  var existing = await supabaseClient
+    .from('config')
+    .select('id')
+    .eq('clave', 'broadcast_activo')
+    .single();
+  if (existing.data) {
+    return supabaseClient.from('config').update({ valor: String(activo) }).eq('clave', 'broadcast_activo');
+  } else {
+    return supabaseClient.from('config').insert([{ clave: 'broadcast_activo', valor: String(activo) }]);
+  }
+}

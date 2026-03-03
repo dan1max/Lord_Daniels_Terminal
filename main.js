@@ -289,7 +289,7 @@ function appendMensaje(m, doScroll) {
   if (!container) { return; }
   var hora  = new Date(m.created_at).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
   var tipo  = m.es_admin ? 'admin' : 'visitor';
-  var alias = m.es_admin ? '[ OPERATOR ]' : (m.alias || 'ANON').toUpperCase();
+  var alias = m.es_admin ? '[ LD ]' : (m.alias || 'ANON').toUpperCase();
   var div = document.createElement('div');
   div.className = 'chat-msg ' + tipo;
   div.innerHTML =

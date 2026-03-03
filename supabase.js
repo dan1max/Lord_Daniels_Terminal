@@ -1,19 +1,16 @@
-// ═══════════════════════════════════════════════════
-// LORD DANIEL'S TERMINAL — SUPABASE CONFIG
-// ═══════════════════════════════════════════════════
+// Property of dani.co
+
 // ⚠️  INSTRUCCIONES DE CONFIGURACIÓN:
 //     1. Ve a tu proyecto en supabase.com
 //     2. Settings → API
 //     3. Copia "Project URL" y "anon public key"
 //     4. Pégalos aquí abajo
-// ═══════════════════════════════════════════════════
 
 const SUPABASE_URL  = 'https://dvyeirpphrrdkdrubehw.supabase.co';
 const SUPABASE_ANON = 'sb_publishable_t8071wTQx0HbyKPTc2w_XQ_dYbvIbfW';
 
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
 
-// ─── FETCH PREDICCIONES ──────────────────────────────
 async function fetchPredicciones(seccion) {
   const { data, error } = await supabaseClient
     .from('predicciones')
@@ -29,7 +26,6 @@ async function fetchPredicciones(seccion) {
   return data || [];
 }
 
-// ─── FETCH ANÁLISIS ──────────────────────────────────
 async function fetchAnalisis(seccion) {
   const { data, error } = await supabaseClient
     .from('analisis')
@@ -43,7 +39,6 @@ async function fetchAnalisis(seccion) {
   return data;
 }
 
-// ─── FETCH DATOS DE GRÁFICOS ─────────────────────────
 async function fetchGrafico(nombre) {
   const { data, error } = await supabaseClient
     .from('graficos')
@@ -55,7 +50,6 @@ async function fetchGrafico(nombre) {
   return data;
 }
 
-// ─── FETCH FECHA ÚLTIMA ACTUALIZACIÓN ────────────────
 async function fetchLastUpdate() {
   const { data } = await supabaseClient
     .from('predicciones')
@@ -67,7 +61,6 @@ async function fetchLastUpdate() {
   return data ? data.created_at : null;
 }
 
-// ─── CRUD PREDICCIONES (ADMIN) ────────────────────────
 async function insertPrediccion(prediccion) {
   const { data, error } = await supabaseClient
     .from('predicciones')
@@ -95,7 +88,6 @@ async function deletePrediccion(id) {
   return { error };
 }
 
-// ─── CRUD ANÁLISIS (ADMIN) ─────────────────────────────
 async function upsertAnalisis(seccion, contenido) {
   // Busca si ya existe uno para esta sección
   const { data: existing } = await supabaseClient
@@ -122,7 +114,6 @@ async function upsertAnalisis(seccion, contenido) {
   }
 }
 
-// ─── CRUD GRÁFICOS (ADMIN) ────────────────────────────
 async function upsertGrafico(nombre, labels, datasets) {
   const { data: existing } = await supabaseClient
     .from('graficos')
@@ -155,7 +146,6 @@ async function upsertGrafico(nombre, labels, datasets) {
   }
 }
 
-// ─── CONFIG (chat_activo) ────────────────────────────
 async function getChatActivo() {
   const { data } = await supabaseClient
     .from('config')
@@ -179,7 +169,6 @@ async function setChatActivo(activo) {
   }
 }
 
-// ─── MENSAJES ────────────────────────────────────────
 async function fetchMensajes(limit = 60) {
   const { data } = await supabaseClient
     .from('mensajes')
@@ -202,22 +191,20 @@ async function deleteMensaje(id) {
   return supabaseClient.from('mensajes').delete().eq('id', id);
 }
 
-// ─── REALTIME SUSCRIPCIÓN ────────────────────────────
 function suscribirMensajes(callback) {
   return supabaseClient
-    .channel('mensajes-canal')
+    .channel('mensajes-visitor')
     .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'mensajes' }, callback)
     .subscribe();
 }
 
 function suscribirConfig(callback) {
   return supabaseClient
-    .channel('config-canal')
+    .channel('config-visitor')
     .on('postgres_changes', { event: '*', schema: 'public', table: 'config' }, callback)
     .subscribe();
 }
 
-// ─── SITE ACTIVO (kill switch) ───────────────────────
 async function getSiteActivo() {
   var result = await supabaseClient
     .from('config')

@@ -5,6 +5,8 @@ var SIGNAL_CHANNEL = 'webrtc-signal';
 
 var broadcastActive = false;
 var micStream = null;
+var radioStream = null;
+var audioCtx = null;
 var peers = {};
 var signalChannel = null;
 
@@ -29,6 +31,7 @@ async function startBroadcast() {
     return;
   }
 
+  radioStream = applyRadioEffect(micStream);
   await setBroadcastActivo(true);
   broadcastActive = true;
   renderBroadcastUI(true);
@@ -72,7 +75,8 @@ async function createPeerForVisitor(vid) {
   var pc = new RTCPeerConnection(STUN_SERVERS);
   peers[vid] = pc;
 
-  micStream.getTracks().forEach(function(track) { pc.addTrack(track, micStream); });
+  var streamToSend = radioStream || micStream;
+  streamToSend.getTracks().forEach(function(track) { pc.addTrack(track, streamToSend); });
 
   pc.onicecandidate = function(e) {
     if (!e.candidate) { return; }
@@ -103,6 +107,8 @@ async function stopBroadcast() {
   }
   Object.values(peers).forEach(function(pc) { pc.close(); });
   peers = {};
+  if (radioStream) { radioStream.getTracks().forEach(function(t) { t.stop(); }); radioStream = null; }
+  if (audioCtx) { audioCtx.close(); audioCtx = null; }
   if (micStream) { micStream.getTracks().forEach(function(t) { t.stop(); }); micStream = null; }
   await setBroadcastActivo(false);
   broadcastActive = false;
@@ -132,4 +138,56 @@ function renderBroadcastUI(active) {
     if (label) { label.textContent = 'BROADCAST OFFLINE'; label.className = 'chat-toggle-status off'; }
     if (info)  { info.textContent = ''; info.style.display = 'none'; }
   }
+}
+
+function applyRadioEffect(stream) {
+  audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  var source = audioCtx.createMediaStreamSource(stream);
+
+  // Bandpass: narrows to voice-band frequencies (300Hz - 3.4kHz) like a phone/radio
+  var bandpass = audioCtx.createBiquadFilter();
+  bandpass.type = 'bandpass';
+  bandpass.frequency.value = 1800;
+  bandpass.Q.value = 0.6;
+
+  // High-pass: cuts low rumble below ~300Hz
+  var hipass = audioCtx.createBiquadFilter();
+  hipass.type = 'highpass';
+  hipass.frequency.value = 300;
+
+  // Waveshaper: soft distortion/saturation
+  var distortion = audioCtx.createWaveShaper();
+  distortion.curve = makeDistortionCurve(60);
+  distortion.oversample = '4x';
+
+  // Compressor: evens out volume like a radio compander
+  var compressor = audioCtx.createDynamicsCompressor();
+  compressor.threshold.value = -24;
+  compressor.knee.value = 8;
+  compressor.ratio.value = 6;
+  compressor.attack.value = 0.003;
+  compressor.release.value = 0.1;
+
+  // Gain: compensate for level loss
+  var gain = audioCtx.createGain();
+  gain.gain.value = 1.8;
+
+  // Chain: source → hipass → bandpass → distortion → compressor → gain → dest
+  source.connect(hipass);
+  hipass.connect(bandpass);
+  bandpass.connect(distortion);
+  distortion.connect(compressor);
+  compressor.connect(gain);
+  var dest = gain.connect(audioCtx.createMediaStreamDestination());
+  return dest.stream;
+}
+
+function makeDistortionCurve(amount) {
+  var samples = 256;
+  var curve = new Float32Array(samples);
+  for (var i = 0; i < samples; i++) {
+    var x = (i * 2) / samples - 1;
+    curve[i] = ((Math.PI + amount) * x) / (Math.PI + amount * Math.abs(x));
+  }
+  return curve;
 }

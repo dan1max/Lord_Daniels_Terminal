@@ -10,6 +10,7 @@ var BOOT_LINES = [
   '> LOADING HISTORICAL RECORDS...',
   '> RUNNING PREDICTIVE MODELS...',
   '> CALIBRATING INSTABILITY INDEX...',
+  '> WARNING: DATA ARE ESTIMATES. THE FUTURE IS UNCERTAIN.',
   '> POSITION DETECTOR ACTIVE.',
   '',
   '> SYSTEM READY.',
@@ -18,6 +19,10 @@ var BOOT_LINES = [
 async function runBootSequence() {
   var log = document.getElementById('boot-log');
   var bootScreen = document.getElementById('boot-screen');
+
+  var bootAudio = new Audio('booting-up.m4a');
+  bootAudio.volume = 0.7;
+  bootAudio.play().catch(function() {});
 
   for (var i = 0; i < BOOT_LINES.length; i++) {
     await sleep(i < 6 ? 100 : i < 11 ? 180 : 260);
@@ -55,7 +60,7 @@ async function runBootSequence() {
     current++;
     bar.style.width = current + '%';
     pct.textContent = current + '%';
-    var delay = Math.max(4, Math.round(80 * Math.pow(1 - current / 100, 2.2)));
+    var delay = Math.max(4, Math.round(110 * Math.pow(1 - current / 100, 2.2)));
     await sleep(delay);
     if (current === 33 || current === 66) { await sleep(120); }
   }

@@ -205,20 +205,7 @@ window.addEventListener('DOMContentLoaded', async function() {
     return;
   }
 
-  var initScreen = document.getElementById('init-screen');
-  if (initScreen) {
-    initScreen.classList.remove('hidden');
-    var startFn = function() {
-      initScreen.classList.add('hidden');
-      runBootSequence();
-      document.removeEventListener('click', startFn);
-      document.removeEventListener('keydown', startFn);
-    };
-    document.addEventListener('click', startFn, { once: true });
-    document.addEventListener('keydown', startFn, { once: true });
-  } else {
-    runBootSequence();
-  }
+  runBootSequence();
 });
 
 var chatActivo = false;

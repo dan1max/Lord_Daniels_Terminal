@@ -524,12 +524,14 @@ function initTerminalGame() {
   appendOutput("Type 'help' to see available commands.", 'tg-output-text');
   appendOutput('', '');
 
+  function submitInput() {
+    var val = input.value;
+    input.value = '';
+    runCommand(val);
+  }
+
   input.addEventListener('keydown', function(e) {
-    if (e.key === 'Enter') {
-      var val = input.value;
-      input.value = '';
-      runCommand(val);
-    }
+    if (e.key === 'Enter') { e.preventDefault(); submitInput(); return; }
     if (e.key === 'ArrowUp') {
       e.preventDefault();
       if (gameState.historyIndex < gameState.history.length - 1) {
@@ -549,7 +551,17 @@ function initTerminalGame() {
     }
   });
 
-  document.querySelector('.tg-wrap').addEventListener('click', function() {
-    input.focus();
+  // Fallback for mobile virtual keyboards
+  input.addEventListener('keypress', function(e) {
+    if (e.key === 'Enter' || e.keyCode === 13) { e.preventDefault(); submitInput(); }
+  });
+
+  var sendBtn = document.getElementById('tg-send-btn');
+  if (sendBtn) {
+    sendBtn.addEventListener('click', function() { submitInput(); input.focus(); });
+  }
+
+  document.querySelector('.tg-wrap').addEventListener('click', function(e) {
+    if (e.target !== sendBtn) { input.focus(); }
   });
 }

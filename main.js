@@ -10,6 +10,7 @@ var BOOT_LINES = [
   '> LOADING HISTORICAL RECORDS...',
   '> RUNNING PREDICTIVE MODELS...',
   '> CALIBRATING INSTABILITY INDEX...',
+  '> WARNING: DATA ARE ESTIMATES. THE FUTURE IS UNCERTAIN.',
   '> POSITION DETECTOR ACTIVE.',
   '',
   '> SYSTEM READY.',
@@ -76,6 +77,7 @@ async function runBootSequence() {
   initChat();
   initRealtimeConfig();
   initListener();
+  initTerminalGame();
 }
 
 function sleep(ms) {

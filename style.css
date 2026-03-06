@@ -1566,13 +1566,15 @@ html, body {
 
 
 .tg-mrhouse-popup {
-  position: absolute;
+  position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.96);
+  background: rgba(0,0,0,0.97);
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
-  z-index: 20;
+  z-index: 200;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .tg-mrhouse-popup.hidden { display: none !important; }
@@ -1581,10 +1583,10 @@ html, body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1.2rem;
+  gap: 1rem;
   width: 90%;
   max-width: 500px;
-  padding: 1.5rem 0;
+  padding: 2rem 0 3rem;
 }
 
 .tg-mrhouse-img {
@@ -1592,6 +1594,7 @@ html, body {
   height: auto;
   filter: saturate(0) sepia(1) hue-rotate(70deg) saturate(3) brightness(0.85) contrast(1.1);
   animation: mr-house-glitch 1s steps(1) infinite;
+  flex-shrink: 0;
 }
 
 .tg-mrhouse-text {
@@ -1600,7 +1603,6 @@ html, body {
   color: var(--green-mid);
   line-height: 1.8;
   width: 100%;
-  min-height: 6em;
   text-align: left;
   border-left: 2px solid var(--green-dim);
   padding-left: 1rem;
@@ -1615,11 +1617,12 @@ html, body {
   color: var(--green-dim);
   font-family: var(--font-mono);
   font-size: 11px;
-  padding: 0.5rem 1.2rem;
+  padding: 0.6rem 1.4rem;
   cursor: pointer;
   letter-spacing: 2px;
   transition: all 0.15s;
-  margin-top: 0.5rem;
+  margin-top: 1rem;
+  width: 100%;
 }
 
 .tg-mrhouse-close:hover {
@@ -1629,8 +1632,13 @@ html, body {
 }
 
 @media (max-width: 768px) {
-  .tg-mrhouse-img   { width: clamp(120px, 40vw, 200px); }
-  .tg-mrhouse-text  { font-size: 11px; }
+  .tg-mrhouse-img {
+    width: clamp(100px, 55vw, 220px);
+    max-height: 35vh;
+    object-fit: contain;
+  }
+  .tg-mrhouse-text  { font-size: 12px; }
+  .tg-mrhouse-inner { padding: 1.2rem 0 4rem; gap: 0.8rem; }
 }
 
 .tg-send-btn {

@@ -46,7 +46,7 @@ var FS = {
             '  "Because 37 was taken, and 39 sounded desperate."',
             '',
             'Public records beyond this point are classified.',
-            "Access dancoind/ with proper credentials to continue.",
+            'Access dancoind/ with proper credentials to continue.',
           ].join('\n')
         },
         'news_archive.txt': {
@@ -100,7 +100,7 @@ var FS = {
             'Lord Daniel has personally reviewed and signed this order.',
             'The continuation of DanCo is the continuation of civilization.',
             '',
-            "Access the projects/ directory with codename: Project's name.",
+            "Access the projects/ directory with the project codename.",
             '(You already know it.)',
           ].join('\n')
         },
@@ -175,22 +175,24 @@ var FS = {
                 'Phase 1: Neural mapping — COMPLETE',
                 '  Full synaptic architecture of Lord Daniel Hargrove digitized.',
                 '  Memory fidelity: 99.7%',
-                '  Personality matrix: stable',
+                '  Cognitive integrity: confirmed stable.',
                 '',
                 'Phase 2: Substrate transfer — COMPLETE',
-                '  Lord Daniel\'s consciousness was successfully transferred',
-                '  server network. The procedure was performed as planned and without incident.',
+                '  Lord Daniel Hargrove was successfully transferred to',
+                '  the DanCo distributed server network.',
+                '  The procedure was performed as planned and without incident.',
                 '',
                 'Phase 3: Internet integration — COMPLETE',
                 '  The distributed consciousness is now embedded across',
                 '  public and private network infrastructure worldwide.',
-                '  It cannot be switched off without destroying the internet.',
+                '  Continuity is guaranteed. The network cannot be destroyed',
+                '  without taking the entire internet with it.',
                 '',
                 'Lord Daniel Hargrove is operational.',
                 'The terminal you are using is, in part, his mind.',
                 '',
                 'The operation codename for Phase 3 was Protocol EXODUS.',
-                "Classified archive access requires that word.",
+                'Classified archive access requires that word.',
               ].join('\n')
             },
             'classified': {
@@ -218,11 +220,11 @@ var FS = {
                     '04:52:12 — Biological functions ceased as planned.',
                     '',
                     '--- FINAL LOG ENTRY BY DR. VASQUEZ ---',
-                    'At 04:52:14, Lord Daniel\'s first message appeared on screen.',
+                    'At 04:52:14, Lord Daniel Hargrove wrote his first message.',
                     'The procedure was a success.',
                     '',
                     'The final partition is protected.',
-                    'Per Lord Daniel\'s instruction, the key to the last directory',
+                    'Per Lord Daniel instruction, the key to the last directory',
                     'is the year this log was written.',
                     '',
                     'The final message is encrypted. The cipher key is',
@@ -236,21 +238,7 @@ var FS = {
                   children: {
                     'final_transmission.txt': {
                       type: 'file',
-                      content: [
-                        'FINAL TRANSMISSION',
-                        '==================',
-                        '',
-                        'If you are reading this, you found your way through.',
-                        'Through the company. Through the war. Through the transfer.',
-                        'Through me.',
-                        '',
-                        'One message remains. It is encrypted.',
-                        'You have everything you need to read it.',
-                        '',
-                        '> FOAOVLWSLWYHRN',
-                        '',
-                        '— LD',
-                      ].join('\n')
+                      content: ''
                     }
                   }
                 }
@@ -263,12 +251,20 @@ var FS = {
   }
 };
 
+// ---------------------------------------------------------------------------
+// State
+// ---------------------------------------------------------------------------
+
 var gameState = {
   cwd: [],
   unlocked: {},
   history: [],
   historyIndex: -1,
 };
+
+// ---------------------------------------------------------------------------
+// Filesystem helpers
+// ---------------------------------------------------------------------------
 
 function cwdNode() {
   var node = FS;
@@ -283,11 +279,21 @@ function cwdPath() {
 }
 
 async function sha256(str) {
-  var buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str.toLowerCase().trim()));
-  return Array.from(new Uint8Array(buf)).map(function(b) { return b.toString(16).padStart(2, '0'); }).join('');
+  var buf = await crypto.subtle.digest(
+    'SHA-256',
+    new TextEncoder().encode(str.toLowerCase().trim())
+  );
+  return Array.from(new Uint8Array(buf))
+    .map(function(b) { return b.toString(16).padStart(2, '0'); })
+    .join('');
 }
 
+// ---------------------------------------------------------------------------
+// Commands
+// ---------------------------------------------------------------------------
+
 var COMMANDS = {
+
   help: function() {
     return [
       'AVAILABLE COMMANDS',
@@ -314,15 +320,13 @@ var COMMANDS = {
     if (entries.length === 0) { return '(empty)'; }
     return entries.map(function(name) {
       var child = node.children[name];
-      var isDir = child.type === 'dir';
+      var isDir  = child.type === 'dir';
       var locked = isDir && child.locked && !gameState.unlocked[cwdPath() + '/' + name];
-      var suffix = isDir ? '/' : '';
-      var lock = locked ? ' [LOCKED]' : '';
-      return (isDir ? 'd ' : '- ') + name + suffix + lock;
+      return (isDir ? 'd ' : '- ') + name + (isDir ? '/' : '') + (locked ? ' [LOCKED]' : '');
     }).join('\n');
   },
 
-  cd: async function(args) {
+  cd: function(args) {
     var target = args[0];
     if (!target) { return 'Usage: cd <directory>'; }
     if (target === '..') {
@@ -338,9 +342,9 @@ var COMMANDS = {
     if (!node.children || !node.children[target]) {
       return target + ': no such file or directory';
     }
-    var child = node.children[target];
-    if (child.type !== 'dir') { return target + ': not a directory'; }
+    var child    = node.children[target];
     var fullPath = cwdPath() + '/' + target;
+    if (child.type !== 'dir') { return target + ': not a directory'; }
     if (child.locked && !gameState.unlocked[fullPath]) {
       return '[LOCKED] ' + target + '/ requires a password. Use: unlock <password>';
     }
@@ -367,25 +371,21 @@ var COMMANDS = {
   unlock: async function(args) {
     var pass = args[0];
     if (!pass) { return 'Usage: unlock <password>'; }
-    var node = cwdNode();
+    var node    = cwdNode();
     var entries = Object.keys(node.children || {});
-    var hash = await sha256(pass);
-    var found = false;
+    var hash    = await sha256(pass);
     for (var i = 0; i < entries.length; i++) {
-      var name = entries[i];
+      var name  = entries[i];
       var child = node.children[name];
       if (child.type === 'dir' && child.locked) {
         var fullPath = cwdPath() + '/' + name;
         if (!gameState.unlocked[fullPath] && child.passwordHash === hash) {
           gameState.unlocked[fullPath] = true;
-          found = true;
           return '[ACCESS GRANTED] ' + name + '/ is now unlocked.';
         }
       }
     }
-    if (!found) {
-      return '[ACCESS DENIED] Incorrect password or no locked directory here.';
-    }
+    return '[ACCESS DENIED] Incorrect password or no locked directory here.';
   },
 
   clear: function() {
@@ -393,18 +393,23 @@ var COMMANDS = {
     if (output) { output.innerHTML = ''; }
     return null;
   }
+
 };
 
-async function runCommand(input) {
-  input = input.trim();
+// ---------------------------------------------------------------------------
+// Core engine
+// ---------------------------------------------------------------------------
+
+async function runCommand(raw) {
+  var input = raw.trim();
   if (!input) { return; }
 
   gameState.history.unshift(input);
   gameState.historyIndex = -1;
 
   var parts = input.split(/\s+/);
-  var cmd = parts[0].toLowerCase();
-  var args = parts.slice(1);
+  var cmd   = parts[0].toLowerCase();
+  var args  = parts.slice(1);
 
   appendOutput('> ' + input, 'tg-cmd-echo');
 
@@ -412,7 +417,7 @@ async function runCommand(input) {
   if (COMMANDS[cmd]) {
     result = await COMMANDS[cmd](args);
   } else {
-    result = cmd + ': command not found. Type \'help\' for available commands.';
+    result = cmd + ": command not found. Type 'help' for available commands.";
   }
 
   if (result !== null && result !== undefined && result !== '') {
@@ -427,10 +432,9 @@ function appendOutput(text, className) {
   var output = document.getElementById('tg-output');
   if (!output) { return; }
   var div = document.createElement('div');
-  div.className = className || '';
+  div.className   = className || '';
   div.textContent = text;
   output.appendChild(div);
-  output.scrollTop = output.scrollHeight;
   var wrap = document.querySelector('.tg-wrap');
   if (wrap) { wrap.scrollTop = wrap.scrollHeight; }
 }
@@ -440,19 +444,9 @@ function updatePrompt() {
   if (prompt) { prompt.textContent = 'guest@danco:' + cwdPath() + '$ '; }
 }
 
-
-  overlay.classList.remove('hidden');
-  document.getElementById('tg-popup-continue').focus();
-  document.getElementById('tg-popup-continue').onclick = function() {
-    overlay.classList.add('hidden');
-    callback(true);
-  };
-  document.getElementById('tg-popup-back').onclick = function() {
-    overlay.classList.add('hidden');
-    callback(false);
-  };
-}
-
+// ---------------------------------------------------------------------------
+// Mr House popup (final_transmission.txt)
+// ---------------------------------------------------------------------------
 
 function showMrHouseTerminalPopup() {
   var popup = document.getElementById('tg-mrhouse-popup');
@@ -485,14 +479,17 @@ function showMrHouseTerminalPopup() {
   textEl.innerHTML = '';
 
   var i = 0;
-  var baseDelay = 600;
   function typeLine() {
     if (i >= lines.length) { return; }
     var line = lines[i];
     var p = document.createElement('div');
     p.className = 'tg-mrhouse-line' + (line === '' ? ' tg-mrhouse-blank' : '');
     textEl.appendChild(p);
-    if (line === '') { i++; setTimeout(typeLine, 200); return; }
+    if (line === '') {
+      i++;
+      setTimeout(typeLine, 200);
+      return;
+    }
     var j = 0;
     var interval = setInterval(function() {
       p.textContent += line[j];
@@ -500,7 +497,7 @@ function showMrHouseTerminalPopup() {
       if (j >= line.length) {
         clearInterval(interval);
         i++;
-        setTimeout(typeLine, line.startsWith('>') ? 800 : 350);
+        setTimeout(typeLine, line.charAt(0) === '>' ? 800 : 350);
       }
     }, 28);
   }
@@ -514,21 +511,24 @@ function showMrHouseTerminalPopup() {
   };
 }
 
+// ---------------------------------------------------------------------------
+// Init
+// ---------------------------------------------------------------------------
+
 function initTerminalGame() {
   var input = document.getElementById('tg-input');
   if (!input) { return; }
 
   updatePrompt();
-
   appendOutput('DANCO INDUSTRIES TERMINAL v4.2.1', 'tg-output-text');
   appendOutput("Type 'help' to see available commands.", 'tg-output-text');
   appendOutput('', '');
 
-  input.addEventListener('keydown', async function(e) {
+  input.addEventListener('keydown', function(e) {
     if (e.key === 'Enter') {
       var val = input.value;
       input.value = '';
-      await runCommand(val);
+      runCommand(val);
     }
     if (e.key === 'ArrowUp') {
       e.preventDefault();

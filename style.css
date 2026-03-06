@@ -1497,4 +1497,66 @@ html, body {
   .mr-house-send  { width: 100%; text-align: center; }
 }
 
-// 1500 líneas!
+.tg-wrap {
+  background: #000;
+  border: 1px solid var(--green-dim);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--green-mid);
+  padding: 1rem;
+  min-height: 520px;
+  max-height: 70vh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  cursor: text;
+  box-shadow: inset 0 0 30px rgba(0,0,0,0.8), 0 0 12px rgba(57,255,20,0.08);
+}
+
+#tg-output {
+  flex: 1;
+  white-space: pre-wrap;
+  word-break: break-word;
+  line-height: 1.6;
+}
+
+.tg-cmd-echo {
+  color: var(--green-bright);
+  margin-top: 0.5rem;
+}
+
+.tg-output-text {
+  color: var(--green-mid);
+  line-height: 1.6;
+}
+
+.tg-input-row {
+  display: flex;
+  align-items: center;
+  margin-top: 0.5rem;
+  gap: 0.3rem;
+}
+
+.tg-prompt {
+  color: var(--green-bright);
+  white-space: nowrap;
+  flex-shrink: 0;
+  font-size: 13px;
+}
+
+.tg-input {
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--green-bright);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  flex: 1;
+  caret-color: var(--green-bright);
+}
+
+@media (max-width: 768px) {
+  .tg-wrap { font-size: 11px; min-height: 400px; padding: 0.6rem; }
+  .tg-prompt { font-size: 11px; }
+  .tg-input { font-size: 11px; }
+}

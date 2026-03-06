@@ -22,15 +22,7 @@ async function runBootSequence() {
 
   var bootAudio = new Audio('booting-up.m4a');
   bootAudio.volume = 0.7;
-  bootAudio.play().catch(function() {
-    var resume = function() {
-      bootAudio.play().catch(function() {});
-      document.removeEventListener('click', resume);
-      document.removeEventListener('keydown', resume);
-    };
-    document.addEventListener('click', resume, { once: true });
-    document.addEventListener('keydown', resume, { once: true });
-  });
+  bootAudio.play().catch(function() {});
 
   for (var i = 0; i < BOOT_LINES.length; i++) {
     await sleep(i < 6 ? 100 : i < 11 ? 180 : 260);
@@ -212,7 +204,21 @@ window.addEventListener('DOMContentLoaded', async function() {
       .subscribe();
     return;
   }
-  runBootSequence();
+
+  var initScreen = document.getElementById('init-screen');
+  if (initScreen) {
+    initScreen.classList.remove('hidden');
+    var startFn = function() {
+      initScreen.classList.add('hidden');
+      runBootSequence();
+      document.removeEventListener('click', startFn);
+      document.removeEventListener('keydown', startFn);
+    };
+    document.addEventListener('click', startFn, { once: true });
+    document.addEventListener('keydown', startFn, { once: true });
+  } else {
+    runBootSequence();
+  }
 });
 
 var chatActivo = false;

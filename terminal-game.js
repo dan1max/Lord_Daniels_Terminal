@@ -351,12 +351,12 @@ var COMMANDS = {
           if (proceed) {
             gameState.projectsWarningShown = true;
             gameState.cwd.push(target);
-            updatePrompt();
-            appendOutput('[CLEARANCE CONFIRMED] Entering classified directory.', 'tg-output-text');
           } else {
             appendOutput('[ABORTED] Access to projects/ cancelled.', 'tg-output-text');
           }
-          resolve(null);
+          resolve(proceed ? '' : null);
+          var inp = document.getElementById('tg-input');
+          if (inp) { inp.focus(); }
         });
       });
     }
@@ -418,6 +418,8 @@ async function runCommand(input) {
   var cmd = parts[0].toLowerCase();
   var args = parts.slice(1);
 
+  appendOutput('> ' + input, 'tg-cmd-echo');
+
   var result;
   if (COMMANDS[cmd]) {
     result = await COMMANDS[cmd](args);
@@ -425,11 +427,12 @@ async function runCommand(input) {
     result = cmd + ': command not found. Type \'help\' for available commands.';
   }
 
-  appendOutput('> ' + input, 'tg-cmd-echo');
   if (result !== null && result !== undefined && result !== '') {
     appendOutput(result, 'tg-output-text');
   }
   updatePrompt();
+  var inp = document.getElementById('tg-input');
+  if (inp) { inp.focus(); }
 }
 
 function appendOutput(text, className) {
@@ -454,6 +457,7 @@ function showClassifiedPopup(callback) {
   var overlay = document.getElementById('tg-classified-overlay');
   if (!overlay) { return callback(false); }
   overlay.classList.remove('hidden');
+  document.getElementById('tg-popup-continue').focus();
   document.getElementById('tg-popup-continue').onclick = function() {
     overlay.classList.add('hidden');
     callback(true);

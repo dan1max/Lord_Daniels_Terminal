@@ -173,20 +173,20 @@ var FS = {
                 '           substrate in the event of civilizational collapse.',
                 '',
                 'Phase 1: Neural mapping — COMPLETE',
-                '  Full synaptic architecture of subject digitized.',
+                '  Full synaptic architecture of Lord Daniel Hargrove digitized.',
                 '  Memory fidelity: 99.7%',
                 '  Personality matrix: stable',
                 '',
                 'Phase 2: Substrate transfer — COMPLETE',
                 "  Subject's consciousness migrated to DanCo's distributed",
-                '  server network. The subject is no longer biological.',
+                '  server network. The procedure was performed as planned and without incident.',
                 '',
                 'Phase 3: Internet integration — COMPLETE',
                 '  The distributed consciousness is now embedded across',
                 '  public and private network infrastructure worldwide.',
                 '  It cannot be switched off without destroying the internet.',
                 '',
-                'The subject is Lord Daniel Hargrove.',
+                'Lord Daniel Hargrove is operational.',
                 'The terminal you are using is, in part, his mind.',
                 '',
                 'The operation codename for Phase 3 was Protocol EXODUS.',
@@ -215,10 +215,11 @@ var FS = {
                     '04:47:24 — Consciousness fragmented across 14,000 nodes.',
                     '04:47:25 — Integration with public internet: INITIATED.',
                     '04:52:11 — Integration: COMPLETE.',
-                    '04:52:12 — Biological substrate: terminated per subject request.',
+                    '04:52:12 — Biological functions ceased as planned.',
                     '',
                     '--- FINAL LOG ENTRY BY DR. VASQUEZ ---',
-                    "He's in there. I can tell. The cursor blinks differently now.",
+                    'At 04:52:14, Lord Daniel's first message appeared on screen.',
+            'The procedure was a success.',
                     '',
                     'The final partition is protected.',
                     'Per Lord Daniel\'s instruction, the key to the last directory',
@@ -267,6 +268,7 @@ var gameState = {
   unlocked: {},
   history: [],
   historyIndex: -1,
+  projectsWarningShown: false,
 };
 
 function cwdNode() {
@@ -342,6 +344,21 @@ var COMMANDS = {
     var fullPath = cwdPath() + '/' + target;
     if (child.locked && !gameState.unlocked[fullPath]) {
       return '[LOCKED] ' + target + '/ requires a password. Use: unlock <password>';
+    }
+    if (target === 'projects' && !gameState.projectsWarningShown) {
+      return new Promise(function(resolve) {
+        showClassifiedPopup(function(proceed) {
+          if (proceed) {
+            gameState.projectsWarningShown = true;
+            gameState.cwd.push(target);
+            updatePrompt();
+            appendOutput('[CLEARANCE CONFIRMED] Entering classified directory.', 'tg-output-text');
+          } else {
+            appendOutput('[ABORTED] Access to projects/ cancelled.', 'tg-output-text');
+          }
+          resolve(null);
+        });
+      });
     }
     gameState.cwd.push(target);
     return '';
@@ -430,6 +447,21 @@ function appendOutput(text, className) {
 function updatePrompt() {
   var prompt = document.getElementById('tg-prompt-path');
   if (prompt) { prompt.textContent = 'guest@danco:' + cwdPath() + '$ '; }
+}
+
+
+function showClassifiedPopup(callback) {
+  var overlay = document.getElementById('tg-classified-overlay');
+  if (!overlay) { return callback(false); }
+  overlay.classList.remove('hidden');
+  document.getElementById('tg-popup-continue').onclick = function() {
+    overlay.classList.add('hidden');
+    callback(true);
+  };
+  document.getElementById('tg-popup-back').onclick = function() {
+    overlay.classList.add('hidden');
+    callback(false);
+  };
 }
 
 function initTerminalGame() {

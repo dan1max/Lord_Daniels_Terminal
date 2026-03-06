@@ -1632,3 +1632,20 @@ html, body {
   .tg-mrhouse-img   { width: clamp(120px, 40vw, 200px); }
   .tg-mrhouse-text  { font-size: 11px; }
 }
+
+.tg-send-btn {
+  display: none;
+  background: transparent;
+  border: 1px solid var(--green-dim);
+  color: var(--green-bright);
+  font-family: var(--font-mono);
+  font-size: 14px;
+  padding: 0.2rem 0.6rem;
+  cursor: pointer;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+@media (max-width: 768px) {
+  .tg-send-btn { display: block; }
+}

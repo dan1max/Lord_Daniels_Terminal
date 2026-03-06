@@ -22,7 +22,15 @@ async function runBootSequence() {
 
   var bootAudio = new Audio('booting-up.m4a');
   bootAudio.volume = 0.7;
-  bootAudio.play().catch(function() {});
+  bootAudio.play().catch(function() {
+    var resume = function() {
+      bootAudio.play().catch(function() {});
+      document.removeEventListener('click', resume);
+      document.removeEventListener('keydown', resume);
+    };
+    document.addEventListener('click', resume, { once: true });
+    document.addEventListener('keydown', resume, { once: true });
+  });
 
   for (var i = 0; i < BOOT_LINES.length; i++) {
     await sleep(i < 6 ? 100 : i < 11 ? 180 : 260);

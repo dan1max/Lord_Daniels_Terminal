@@ -268,7 +268,6 @@ var gameState = {
   unlocked: {},
   history: [],
   historyIndex: -1,
-  projectsWarningShown: false,
 };
 
 function cwdNode() {
@@ -345,21 +344,6 @@ var COMMANDS = {
     if (child.locked && !gameState.unlocked[fullPath]) {
       return '[LOCKED] ' + target + '/ requires a password. Use: unlock <password>';
     }
-    if (target === 'projects' && !gameState.projectsWarningShown) {
-      return new Promise(function(resolve) {
-        showClassifiedPopup(function(proceed) {
-          if (proceed) {
-            gameState.projectsWarningShown = true;
-            gameState.cwd.push(target);
-          } else {
-            appendOutput('[ABORTED] Access to projects/ cancelled.', 'tg-output-text');
-          }
-          resolve(proceed ? '' : null);
-          var inp = document.getElementById('tg-input');
-          if (inp) { inp.focus(); }
-        });
-      });
-    }
     gameState.cwd.push(target);
     return '';
   },
@@ -373,6 +357,10 @@ var COMMANDS = {
     }
     var child = node.children[target];
     if (child.type !== 'file') { return target + ': is a directory'; }
+    if (target === 'final_transmission.txt') {
+      showMrHouseTerminalPopup();
+      return null;
+    }
     return child.content;
   },
 
@@ -453,9 +441,6 @@ function updatePrompt() {
 }
 
 
-function showClassifiedPopup(callback) {
-  var overlay = document.getElementById('tg-classified-overlay');
-  if (!overlay) { return callback(false); }
   overlay.classList.remove('hidden');
   document.getElementById('tg-popup-continue').focus();
   document.getElementById('tg-popup-continue').onclick = function() {
@@ -465,6 +450,67 @@ function showClassifiedPopup(callback) {
   document.getElementById('tg-popup-back').onclick = function() {
     overlay.classList.add('hidden');
     callback(false);
+  };
+}
+
+
+function showMrHouseTerminalPopup() {
+  var popup = document.getElementById('tg-mrhouse-popup');
+  if (!popup) { return; }
+  popup.classList.remove('hidden');
+
+  var img = popup.querySelector('.tg-mrhouse-img');
+  if (img) {
+    img.style.animationDuration = (10 + Math.floor(Math.random() * 5)) + 's';
+    img.style.animationDelay    = '-' + (Math.random() * 8).toFixed(2) + 's';
+  }
+
+  var lines = [
+    'You made it.',
+    'Through the bureaucracy. Through the history. Through the war.',
+    'Through me.',
+    '',
+    'I left one final message. It is encrypted.',
+    'You have everything you need to read it.',
+    '',
+    '> FOAOVLWSLWYHRN',
+    '',
+    'Decrypt it. You know the key.',
+    '',
+    '— LD',
+  ];
+
+  var textEl = document.getElementById('tg-mrhouse-text');
+  if (!textEl) { return; }
+  textEl.innerHTML = '';
+
+  var i = 0;
+  var baseDelay = 600;
+  function typeLine() {
+    if (i >= lines.length) { return; }
+    var line = lines[i];
+    var p = document.createElement('div');
+    p.className = 'tg-mrhouse-line' + (line === '' ? ' tg-mrhouse-blank' : '');
+    textEl.appendChild(p);
+    if (line === '') { i++; setTimeout(typeLine, 200); return; }
+    var j = 0;
+    var interval = setInterval(function() {
+      p.textContent += line[j];
+      j++;
+      if (j >= line.length) {
+        clearInterval(interval);
+        i++;
+        setTimeout(typeLine, line.startsWith('>') ? 800 : 350);
+      }
+    }, 28);
+  }
+  setTimeout(typeLine, 400);
+
+  document.getElementById('tg-mrhouse-close').onclick = function() {
+    popup.classList.add('hidden');
+    textEl.innerHTML = '';
+    var inp = document.getElementById('tg-input');
+    if (inp) { inp.focus(); }
   };
 }
 

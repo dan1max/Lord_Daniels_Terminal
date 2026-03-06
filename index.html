@@ -3,10 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
   <title>LORD DANIEL'S TERMINAL</title>
   <link rel="stylesheet" href="style.css" />
   <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=VT323&display=swap" rel="stylesheet" />
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js?v=5"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
@@ -242,7 +245,8 @@
           <div id="tg-output"></div>
           <div class="tg-input-row">
             <span id="tg-prompt-path" class="tg-prompt">guest@danco:/$ </span>
-            <input id="tg-input" class="tg-input" type="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
+            <input id="tg-input" class="tg-input" type="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" enterkeyhint="send" />
+            <button id="tg-send-btn" class="tg-send-btn">↵</button>
           </div>
         </div>
       </section>
@@ -256,10 +260,10 @@
 
   </div>
 
-  <script src="supabase.js"></script>
-  <script src="charts.js"></script>
-  <script src="main.js"></script>
-  <script src="listener.js"></script>
-  <script src="terminal-game.js"></script>
+  <script src="supabase.js?v=5"></script>
+  <script src="charts.js?v=5"></script>
+  <script src="main.js?v=5"></script>
+  <script src="listener.js?v=5"></script>
+  <script src="terminal-game.js?v=5"></script>
 </body>
 </html>

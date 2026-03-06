@@ -52,6 +52,7 @@
         <button class="nav-btn" data-section="geopolitica">[ GEOPOLÍTICA ]</button>
         <div class="nav-spacer"></div>
         <button class="nav-btn" data-section="chat">[ TERMINAL DE CONTACTO ]</button>
+        <button class="nav-btn" data-section="terminal">[ TERMINAL ]</button>
         <a href="panel.html" class="nav-btn nav-admin">[ ADMIN ]</a>
       </div>
     </nav>
@@ -221,6 +222,20 @@
       <button id="broadcast-unmute" class="broadcast-unmute" style="display:none;" onclick="document.getElementById('broadcast-audio').play();this.style.display='none'">[ TAP TO UNMUTE ]</button>
     </div>
 
+
+      <section id="section-terminal" class="terminal-section hidden">
+        <div class="section-header">
+          <span class="section-title">MÓDULO: TERMINAL</span>
+        </div>
+        <div class="tg-wrap">
+          <div id="tg-output"></div>
+          <div class="tg-input-row">
+            <span id="tg-prompt-path" class="tg-prompt">guest@danco:/$ </span>
+            <input id="tg-input" class="tg-input" type="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
+          </div>
+        </div>
+      </section>
+
     </main>
     <footer class="terminal-footer">
       <span>LORD DANIEL'S TERMINAL © 2024</span>
@@ -234,5 +249,6 @@
   <script src="charts.js"></script>
   <script src="main.js"></script>
   <script src="listener.js"></script>
+  <script src="terminal-game.js"></script>
 </body>
 </html>

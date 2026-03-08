@@ -3,14 +3,14 @@
 var BOOT_LINES = [
   '> SYSTEM CHECK... [OK]',
   '> MEMORY INTEGRITY... [OK]',
-  '> POLITICAL ANALYSIS MODULE... [OK]',
-  '> ECONOMIC MODULE... [OK]',
-  '> GEOPOLITICAL MODULE... [OK]',
+  '> FILESYSTEM INTEGRITY... [OK]',
+  '> NETWORK LAYER... [OK]',
+  '> ENCRYPTION PROTOCOLS... [OK]',
   '> DATABASE CONNECTION... [OK]',
-  '> LOADING HISTORICAL RECORDS...',
-  '> RUNNING PREDICTIVE MODELS...',
-  '> CALIBRATING INSTABILITY INDEX...',
-  '> WARNING: DATA ARE ESTIMATES. THE FUTURE IS UNCERTAIN.',
+  '> LOADING ARCHIVE DATA...',
+  '> DECRYPTING PARTITIONS...',
+  '> MOUNTING DISTRIBUTED NODES...',
+  '> WARNING: SOME PARTITIONS ARE LOCKED. CLEARANCE REQUIRED.',
   '> POSITION DETECTOR ACTIVE.',
   '',
   '> SYSTEM READY.',
@@ -84,20 +84,9 @@ function sleep(ms) {
   return new Promise(function(resolve) { setTimeout(resolve, ms); });
 }
 
-async function initTerminal() {
+function initTerminal() {
   updateClock();
   setInterval(updateClock, 1000);
-  renderAllCharts();
-  await loadSectionContent('espana');
-  await loadSectionContent('economia');
-  await loadSectionContent('geopolitica');
-
-  var lastUpdate = await fetchLastUpdate();
-  if (lastUpdate) {
-    var d = new Date(lastUpdate);
-    document.getElementById('footer-last-update').textContent =
-      'LAST UPDATE: ' + d.toLocaleDateString('es-ES').toUpperCase();
-  }
 }
 
 function updateClock() {
@@ -122,8 +111,9 @@ if (hamburger && navItems) {
 document.querySelectorAll('.nav-btn[data-section]').forEach(function(btn) {
   btn.addEventListener('click', function() {
     var target = btn.dataset.section;
-    document.querySelectorAll('.terminal-section').forEach(function(s) { s.classList.add('hidden'); });
+    document.querySelectorAll('.terminal-section').forEach(function(s) { s.classList.remove('active'); s.classList.add('hidden'); });
     document.getElementById('section-' + target).classList.remove('hidden');
+    document.getElementById('section-' + target).classList.add('active');
     document.querySelectorAll('.nav-btn[data-section]').forEach(function(b) { b.classList.remove('active'); });
     btn.classList.add('active');
     if (navItems) { navItems.classList.remove('open'); }
@@ -131,57 +121,9 @@ document.querySelectorAll('.nav-btn[data-section]').forEach(function(btn) {
   });
 });
 
-async function loadSectionContent(seccion) {
-  var predicciones = await fetchPredicciones(seccion);
-  var predContainer = document.getElementById(seccion + '-predicciones');
-  if (predContainer) {
-    predContainer.innerHTML = predicciones.length === 0
-      ? noSignalHTML()
-      : predicciones.map(renderPrediccion).join('');
-  }
-  var analisis = await fetchAnalisis(seccion);
-  var analContainer = document.getElementById(seccion + '-analisis');
-  if (analContainer) {
-    analContainer.innerHTML = analisis ? renderAnalisis(analisis.contenido) : noSignalHTML();
-  }
-}
 
-function renderPrediccion(p) {
-  var prob = p.probabilidad || '';
-  var riesgo = p.riesgo || 'low';
-  var badgeClass = riesgo === 'high' ? 'badge-high' : riesgo === 'mid' ? 'badge-mid' : 'badge-low';
-  var riesgoLabel = riesgo === 'high' ? 'ALTO' : riesgo === 'mid' ? 'MEDIO' : 'BAJO';
-  var fecha = p.fecha_objetivo ? new Date(p.fecha_objetivo).toLocaleDateString('es-ES') : '';
-  var tags = p.tags ? p.tags.split(',').map(function(t) {
-    return '<span class="badge badge-low">' + t.trim().toUpperCase() + '</span>';
-  }).join('') : '';
-  return '<div class="prediction-item">' +
-    '<div class="prediction-title">' +
-      '<span class="prediction-label">' + escHtml(p.titulo) + '</span>' +
-      '<span class="prediction-prob">' + (prob ? prob + '%' : '') + '</span>' +
-    '</div>' +
-    '<div><span class="badge ' + badgeClass + '">' + riesgoLabel + '</span>' + tags + '</div>' +
-    '<div class="prediction-text">' + escHtml(p.descripcion || '') + '</div>' +
-    (fecha ? '<div class="prediction-date">HORIZON: ' + fecha.toUpperCase() + '</div>' : '') +
-  '</div>';
-}
 
-function renderAnalisis(texto) {
-  if (!texto) { return noSignalHTML(); }
-  var html = texto.split('\n\n').map(function(p) {
-    return '<p>' + p
-      .replace(/\*([^*]+)\*/g, '<span class="highlight">$1</span>')
-      .replace(/\n/g, '<br>') + '</p>';
-  }).join('');
-  return '<div class="analysis-block">' + html + '</div>';
-}
 
-function noSignalHTML() {
-  var delay = (Math.random() * 14).toFixed(2);
-  var dur = 10 + Math.floor(Math.random() * 5);
-  return '<div class="empty-state"><div class="no-signal-text" style="animation-duration:' +
-    dur + 's;animation-delay:-' + delay + 's">NO SIGNAL</div></div>';
-}
 
 function escHtml(str) {
   var div = document.createElement('div');

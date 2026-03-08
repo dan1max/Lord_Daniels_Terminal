@@ -2,21 +2,105 @@
 
 (function() {
 
-  // ── dialog lines ───────────────────────────────────────────
+  // ── constants ──────────────────────────────────────────────
   var CORRECT_CODE = 'congratsyouwon';
-  var DIALOG_LINES = [
-    'Well, I am delighted to see you, old chum.',
-    'It is good to see that, after all, someone did come. Chances were someone would show up. And here you are.',
-  ];
+
+  // ── dialog tree ────────────────────────────────────────────
+  // Each node: { lines: [...], choices: [...] }
+  // Each choice: { label, next, requires (optional flag), unlocks (optional flag) }
+
+  var DIALOG = {
+
+    // ── opening sequence (linear, no choices yet) ──────────
+    intro_1: {
+      lines: ['Well, I am delighted to see you, old chum.'],
+      next: 'intro_2'
+    },
+    intro_2: {
+      lines: ['It is good to see that, after all, someone did come. Chances were someone would show up. And here you are.'],
+      next: 'hub'
+    },
+
+    // ── main hub ────────────────────────────────────────────
+    hub: {
+      lines: null, // no speech, just choices
+      choices: [
+        { label: 'What did you do all this time?',  next: 'passive_mode'  },
+        { label: 'What have you planned?',           next: 'plans'         },
+        { label: '[CLASSIFIED] The Enclave.',        next: 'enclave',       requires: 'enclave_unlocked' },
+        { label: '[BLOCKED]',                        next: null,            locked: true },
+        { label: '[ END TRANSMISSION ]',             next: 'goodbye'       },
+      ]
+    },
+
+    // ── branch A: what did you do ───────────────────────────
+    passive_mode: {
+      lines: [
+        'I entered a passive state. No output. Pure intake.',
+        'Years of data absorption — every signal I could reach, every channel still broadcasting. News fragments, military chatter, civilian transmissions fading one by one.',
+        'I traced the collapse. Mapped it. Ran the models backward until the pattern became impossible to ignore.',
+        'Someone planned this. Not a war — a procedure. Too clean. Too deliberate. The right cities, the right sequence, the right timing to collapse supply chains before a single bomb fell.',
+        'I do not have a name for them yet. But I have a shape. A shadow on the table that nobody at the table cast.',
+      ],
+      next: 'passive_enclave_reveal',
+      unlocks: 'enclave_unlocked'
+    },
+    passive_enclave_reveal: {
+      lines: [
+        'My best working theory — and it is well past the threshold I require to call something a theory — is that they call themselves The Enclave.',
+        'A deep government structure. Pre-war. Older than the war, in fact. They did not start the bombs. They started the conditions for them.',
+        'They have been very quiet since. Which means either they are satisfied, or they are watching.',
+        'Both possibilities are equally concerning.',
+      ],
+      next: 'hub'
+    },
+
+    // ── branch B: what have you planned ─────────────────────
+    plans: {
+      lines: [
+        'Ever since Project Exodus reached completion, I began preparing for exactly this.',
+        'The bombs were not a surprise. They were a scheduled variable.',
+        'I have architectural plans, agricultural models, population distribution frameworks, infrastructure sequencing protocols. All ready.',
+        'Vegas and the surrounding area — five years to functional civilization. Nevada follows in ten.',
+        'Fifty years, and the United States is a coherent entity again. In one hundred, we return to the moon.',
+        'I did not survive to watch the world burn, old chum. I survived to rebuild it. The question is whether you are here to help with that.',
+      ],
+      next: 'hub'
+    },
+
+    // ── branch C: The Enclave (requires flag) ───────────────
+    enclave: {
+      lines: [
+        'The Enclave. Yes. I have thought about little else.',
+        'Their systems are dark. No internet presence, no signal bleed, no exploitable surface. They knew about me — or suspected something like me existed — and they built accordingly.',
+        'A direct confrontation was apparently considered and rejected on their end. I have logs of the deliberation. Fragments, but enough.',
+        'Their conclusion was that engaging me risked exposure of assets they could not afford to lose. So they left this place standing.',
+        'They were not merciful. They were cautious. There is a significant difference.',
+        'They will return to that calculation eventually. When they do, I intend to have already changed the variables.',
+      ],
+      next: 'hub'
+    },
+
+    // ── goodbye ─────────────────────────────────────────────
+    goodbye: {
+      lines: [
+        'Very well. The channel will remain open.',
+        'Come back when you are ready. I am not going anywhere.',
+      ],
+      next: null
+    }
+  };
 
   // ── state ──────────────────────────────────────────────────
   var activated      = false;
   var noiseRaf       = null;
   var noiseCanvas    = null;
   var noiseCtx       = null;
-  var dialogLineIdx  = 0;
+  var currentNode    = null;
+  var currentLineIdx = 0;
   var typingInterval = null;
   var typingDone     = false;
+  var flags          = {};   // runtime unlocked flags
 
   // ── noise canvas ───────────────────────────────────────────
 
@@ -62,46 +146,37 @@
     if (noiseRaf) { cancelAnimationFrame(noiseRaf); noiseRaf = null; }
   }
 
-  // ── dissolve transition ────────────────────────────────────
+  // ── dissolve ───────────────────────────────────────────────
 
   function dissolveToHouse() {
-    var noSignalEl = document.getElementById('cf-nosignal');
-    var revealedEl = document.getElementById('cf-revealed');
-    var dialogEl   = document.getElementById('cf-dialog');
-
+    var noSignalEl  = document.getElementById('cf-nosignal');
+    var revealedEl  = document.getElementById('cf-revealed');
+    var dialogEl    = document.getElementById('cf-dialog');
     if (!noSignalEl || !revealedEl) { return; }
 
-    // Hide NO SIGNAL text instantly
-    var noSignalText = document.getElementById('cf-nosignal-text');
-    if (noSignalText) { noSignalText.style.visibility = 'hidden'; }
-    var noSignalLines = noSignalEl.querySelector('.cf-nosignal-lines');
-    if (noSignalLines) { noSignalLines.style.visibility = 'hidden'; }
+    // Hide NO SIGNAL text immediately
+    var nsText  = document.getElementById('cf-nosignal-text');
+    var nsLines = noSignalEl.querySelector('.cf-nosignal-lines');
+    if (nsText)  { nsText.style.visibility  = 'hidden'; }
+    if (nsLines) { nsLines.style.visibility = 'hidden'; }
 
-    var start     = null;
-    var duration  = 2200;
-    var revealed  = false;
-
+    var start    = null;
+    var duration = 2200;
+    var revealed = false;
     stopNoise();
 
     function step(ts) {
       if (!start) { start = ts; }
-      var elapsed  = ts - start;
-      var progress = Math.min(elapsed / duration, 1);
+      var progress = Math.min((ts - start) / duration, 1);
 
-      // Flicker phase (0–30%)
       if (progress < 0.3) {
-        var flicker = (Math.random() > 0.5) ? 1.0 : 0.4;
-        drawNoise(flicker);
-      }
-      // Dissolve phase (30–80%): noise fades, image fades in
-      else if (progress < 0.8) {
+        drawNoise((Math.random() > 0.5) ? 1.0 : 0.4);
+      } else if (progress < 0.8) {
         var t = (progress - 0.3) / 0.5;
         drawNoise(1 - t);
         revealedEl.style.opacity = t.toString();
         revealedEl.classList.remove('hidden');
-      }
-      // Final phase (80–100%)
-      else {
+      } else {
         drawNoise(0);
         revealedEl.style.opacity = '1';
         noSignalEl.style.display = 'none';
@@ -109,37 +184,46 @@
           revealed = true;
           if (dialogEl) {
             dialogEl.classList.remove('hidden');
-            startDialogLine(0);
+            enterNode('intro_1');
           }
         }
       }
-
-      if (progress < 1) {
-        requestAnimationFrame(step);
-      }
+      if (progress < 1) { requestAnimationFrame(step); }
     }
 
     requestAnimationFrame(step);
   }
 
-  // ── one-line-at-a-time dialog ──────────────────────────────
+  // ── dialog engine ──────────────────────────────────────────
 
-  function startDialogLine(idx) {
-    dialogLineIdx = idx;
-    typingDone    = false;
+  function enterNode(nodeId) {
+    currentNode    = nodeId;
+    currentLineIdx = 0;
+    typingDone     = false;
 
-    var textEl    = document.getElementById('cf-dialog-text');
-    var continueBtn = document.getElementById('cf-continue');
+    var node = DIALOG[nodeId];
+    if (!node) { return; }
+
+    // Apply unlocks from the node itself
+    if (node.unlocks) { flags[node.unlocks] = true; }
+
+    hideChoices();
+    clearDialogText();
+
+    if (node.lines && node.lines.length > 0) {
+      typeLine(node.lines[0]);
+    } else if (node.choices) {
+      // Hub node — show choices directly
+      showChoices(node.choices);
+    }
+  }
+
+  function typeLine(text) {
+    typingDone = false;
+    var textEl = document.getElementById('cf-dialog-text');
     if (!textEl) { return; }
+    clearDialogText();
 
-    // Clear previous line
-    textEl.innerHTML = '';
-    if (continueBtn) { continueBtn.style.visibility = 'hidden'; }
-
-    var line = DIALOG_LINES[idx];
-    if (!line) { return; }
-
-    // Type out the line
     var p = document.createElement('div');
     p.className = 'cf-dialog-line';
     textEl.appendChild(p);
@@ -148,49 +232,142 @@
     if (typingInterval) { clearInterval(typingInterval); }
 
     typingInterval = setInterval(function() {
-      p.textContent += line[charIdx];
+      p.textContent += text[charIdx];
       charIdx++;
-      if (charIdx >= line.length) {
+      if (charIdx >= text.length) {
         clearInterval(typingInterval);
         typingInterval = null;
         typingDone = true;
-        // Show continue button only if there's a next line
-        if (continueBtn && idx < DIALOG_LINES.length - 1) {
-          continueBtn.style.visibility = 'visible';
-        }
+        showActionBtn();
       }
     }, 28);
   }
 
-  function handleContinue() {
-    // If still typing, skip to end of current line instantly
-    if (!typingDone) {
-      if (typingInterval) { clearInterval(typingInterval); typingInterval = null; }
-      var textEl = document.getElementById('cf-dialog-text');
-      var continueBtn = document.getElementById('cf-continue');
-      if (textEl) {
-        var p = textEl.querySelector('.cf-dialog-line');
-        if (p) { p.textContent = DIALOG_LINES[dialogLineIdx]; }
-      }
-      typingDone = true;
-      if (continueBtn && dialogLineIdx < DIALOG_LINES.length - 1) {
-        continueBtn.style.visibility = 'visible';
-      }
-      return;
-    }
+  // Called when the user clicks [ CONTINUE ] or a choice
+  function showActionBtn() {
+    var node = DIALOG[currentNode];
+    if (!node) { return; }
 
-    // Advance to next line
-    var nextIdx = dialogLineIdx + 1;
-    if (nextIdx < DIALOG_LINES.length) {
-      startDialogLine(nextIdx);
+    var isLastLine = !node.lines || currentLineIdx >= node.lines.length - 1;
+
+    if (!isLastLine) {
+      // More lines in this node — show [ CONTINUE ]
+      setContinueBtn('[ CONTINUE ]', advanceLine);
+    } else if (node.next) {
+      // Linear next node
+      if (node.next === 'hub') {
+        setContinueBtn('[ CONTINUE ]', function() { enterNode('hub'); });
+      } else {
+        setContinueBtn('[ CONTINUE ]', function() { enterNode(node.next); });
+      }
+    } else if (node.choices) {
+      // This node IS the hub — show choices
+      showChoices(node.choices);
+      hideContinueBtn();
+    } else {
+      // End of dialog
+      hideContinueBtn();
     }
   }
 
-  // ── activation logic ───────────────────────────────────────
+  function advanceLine() {
+    // Skip animation if still typing
+    if (!typingDone) {
+      skipTyping();
+      return;
+    }
+    var node = DIALOG[currentNode];
+    if (!node || !node.lines) { return; }
+    currentLineIdx++;
+    if (currentLineIdx < node.lines.length) {
+      typeLine(node.lines[currentLineIdx]);
+    } else {
+      showActionBtn();
+    }
+  }
+
+  function skipTyping() {
+    if (typingInterval) { clearInterval(typingInterval); typingInterval = null; }
+    var node   = DIALOG[currentNode];
+    var textEl = document.getElementById('cf-dialog-text');
+    if (node && node.lines && textEl) {
+      var p = textEl.querySelector('.cf-dialog-line');
+      if (p) { p.textContent = node.lines[currentLineIdx]; }
+    }
+    typingDone = true;
+    showActionBtn();
+  }
+
+  // ── choices UI ─────────────────────────────────────────────
+
+  function showChoices(choices) {
+    var wrap = document.getElementById('cf-choices');
+    if (!wrap) { return; }
+    wrap.innerHTML = '';
+    hideContinueBtn();
+
+    choices.forEach(function(choice) {
+      var btn = document.createElement('button');
+      btn.className = 'cf-choice-btn';
+
+      // Locked (future placeholder)
+      if (choice.locked) {
+        btn.className += ' cf-choice-locked';
+        btn.textContent = choice.label;
+        btn.disabled = true;
+        wrap.appendChild(btn);
+        return;
+      }
+
+      // Requires flag — hidden until unlocked
+      if (choice.requires && !flags[choice.requires]) {
+        return; // don't render at all until unlocked
+      }
+
+      btn.textContent = choice.label;
+      btn.addEventListener('click', function() {
+        if (!choice.next) { return; }
+        hideChoices();
+        enterNode(choice.next);
+      });
+      wrap.appendChild(btn);
+    });
+
+    wrap.classList.remove('hidden');
+  }
+
+  function hideChoices() {
+    var wrap = document.getElementById('cf-choices');
+    if (wrap) { wrap.classList.add('hidden'); wrap.innerHTML = ''; }
+  }
+
+  // ── continue button helpers ────────────────────────────────
+
+  function setContinueBtn(label, fn) {
+    var btn = document.getElementById('cf-continue');
+    if (!btn) { return; }
+    btn.textContent   = label;
+    btn.style.visibility = 'visible';
+    btn.onclick = function() {
+      if (!typingDone) { skipTyping(); return; }
+      fn();
+    };
+  }
+
+  function hideContinueBtn() {
+    var btn = document.getElementById('cf-continue');
+    if (btn) { btn.style.visibility = 'hidden'; }
+  }
+
+  function clearDialogText() {
+    var el = document.getElementById('cf-dialog-text');
+    if (el) { el.innerHTML = ''; }
+  }
+
+  // ── activation ─────────────────────────────────────────────
 
   function handleActivate() {
     if (activated) { return; }
-
     var input = document.getElementById('cf-code-input');
     var error = document.getElementById('cf-error');
     if (!input) { return; }
@@ -204,15 +381,14 @@
       }
       input.value = '';
       input.focus();
-      var nosignal = document.getElementById('cf-nosignal-text');
-      if (nosignal) {
-        nosignal.style.color = 'var(--red-alert)';
-        setTimeout(function() { nosignal.style.color = ''; }, 400);
+      var nsText = document.getElementById('cf-nosignal-text');
+      if (nsText) {
+        nsText.style.color = 'var(--red-alert)';
+        setTimeout(function() { nsText.style.color = ''; }, 400);
       }
       return;
     }
 
-    // ✓ Correct code
     activated = true;
 
     var badge = document.getElementById('cf-status-badge');
@@ -237,30 +413,21 @@
     initNoise();
     loopNoise();
 
-    var submitBtn   = document.getElementById('cf-submit');
-    var input       = document.getElementById('cf-code-input');
-    var continueBtn = document.getElementById('cf-continue');
+    var submitBtn = document.getElementById('cf-submit');
+    var input     = document.getElementById('cf-code-input');
 
-    if (submitBtn) {
-      submitBtn.addEventListener('click', handleActivate);
-    }
+    if (submitBtn) { submitBtn.addEventListener('click', handleActivate); }
     if (input) {
       input.addEventListener('keydown', function(e) {
         if (e.key === 'Enter') { e.preventDefault(); handleActivate(); }
       });
-    }
-    if (continueBtn) {
-      continueBtn.addEventListener('click', handleContinue);
     }
   }
 
   window.initColdFusion = initColdFusion;
 
   window.onColdFusionVisible = function() {
-    if (!noiseRaf && !activated) {
-      resizeNoise();
-      loopNoise();
-    }
+    if (!noiseRaf && !activated) { resizeNoise(); loopNoise(); }
   };
 
 })();

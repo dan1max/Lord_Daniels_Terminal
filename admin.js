@@ -1,20 +1,87 @@
 // Property of dani.co
 
+window.addEventListener('DOMContentLoaded', async () => {
+  const session = await getSession();
+  if (session) {
+    showAdmin();
+  } else {
+    document.getElementById('login-view').style.display = 'flex';
+    document.getElementById('login-view').style.justifyContent = 'center';
+  }
+});
+
+document.getElementById('btn-login').addEventListener('click', async () => {
+  const email    = document.getElementById('login-email').value.trim();
+  const password = document.getElementById('login-password').value;
+  const errEl    = document.getElementById('login-error');
+
+  if (!email || !password) {
+    errEl.textContent = '> ERROR: INTRODUCE EMAIL Y CONTRASEÑA';
+    return;
+  }
+
+  errEl.textContent = '> AUTENTICANDO...';
+  const { error } = await signIn(email, password);
+
+  if (error) {
+    errEl.textContent = '> ERROR: ' + error.message.toUpperCase();
+  } else {
+    showAdmin();
+  }
+});
+
+// Enter key en login
+document.getElementById('login-password').addEventListener('keydown', e => {
+  if (e.key === 'Enter') document.getElementById('btn-login').click();
+});
+
+document.getElementById('btn-logout').addEventListener('click', async () => {
+  await signOut();
+  location.reload();
+});
+
+function showAdmin() {
+  document.getElementById('login-view').style.display = 'none';
+  document.getElementById('admin-view').style.display = 'block';
+  initKillSwitchAdmin();
+  initBroadcastAdmin();
+  initAdminChat();
+}
+
+document.querySelectorAll('[data-tab]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.admin-tab').forEach(t => t.style.display = 'none');
+    document.querySelectorAll('[data-tab]').forEach(b => b.classList.remove('active'));
+    document.getElementById(`tab-${btn.dataset.tab}`).style.display = 'block';
+    btn.classList.add('active');
+  });
+});
+
+function showAlert(msg, type = 'success') {
+  const el = document.getElementById('admin-alert');
+  el.className = `alert alert-${type}`;
+  el.textContent = msg;
+  el.style.display = 'block';
+  setTimeout(() => el.style.display = 'none', 3000);
+}
+
+
+
+
 function escHtml(str) {
   const div = document.createElement('div');
   div.textContent = str;
   return div.innerHTML;
 }
 
-// ── CHAT ADMIN ────────────────────────────────────────────────────────────────
+// CHAT ADMIN
 
 let adminChatActivo = false;
-var _adminChatInit = false;
 
+var _adminChatInit = false;
 async function initAdminChat() {
   if (_adminChatInit) { return; }
   _adminChatInit = true;
-
   adminChatActivo = await getChatActivo();
   renderToggleUI();
   await cargarAdminMensajes();
@@ -24,7 +91,7 @@ async function initAdminChat() {
     appendAdminMensaje(payload.new);
   });
 
-  // Realtime: cambio de estado del chat
+  // Realtime: cambio de estado
   suscribirConfig(payload => {
     if (payload.new && payload.new.clave === 'chat_activo') {
       adminChatActivo = payload.new.valor === 'true';
@@ -32,21 +99,21 @@ async function initAdminChat() {
     }
   });
 
+  // Toggle
   document.getElementById('btn-toggle-chat').addEventListener('click', async () => {
     adminChatActivo = !adminChatActivo;
     await setChatActivo(adminChatActivo);
     renderToggleUI();
-    showAlert(adminChatActivo
-      ? '> CANAL ACTIVADO — LOS VISITANTES PUEDEN CHATEAR'
-      : '> CANAL CERRADO — NO SIGNAL'
-    );
+    showAlert(adminChatActivo ? '> CANAL ACTIVADO — LOS VISITANTES PUEDEN CHATEAR' : '> CANAL CERRADO — NO SIGNAL');
   });
 
+  // Enviar respuesta
   document.getElementById('admin-chat-send').addEventListener('click', enviarRespuestaAdmin);
   document.getElementById('admin-chat-msg').addEventListener('keydown', e => {
     if (e.key === 'Enter') enviarRespuestaAdmin();
   });
 
+  // Borrar todo
   document.getElementById('btn-clear-chat').addEventListener('click', async () => {
     if (!confirm('¿Borrar todos los mensajes del chat?')) return;
     const msgs = await fetchMensajes(200);
@@ -114,12 +181,13 @@ function scrollAdminChat() {
 async function enviarRespuestaAdmin() {
   const texto = document.getElementById('admin-chat-msg').value.trim();
   if (!texto) return;
+
   document.getElementById('admin-chat-msg').value = '';
   const { error } = await insertMensaje('LD', texto, true);
   if (error) showAlert('> ERROR AL ENVIAR: ' + error.message, 'error');
 }
 
-// ── KILL SWITCH ADMIN ─────────────────────────────────────────────────────────
+// KILL SWITCH ADMIN
 
 var siteActivo = true;
 

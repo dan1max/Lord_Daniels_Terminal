@@ -75,88 +75,10 @@
       <button class="nav-btn" data-tab="broadcast">[ BROADCAST ]</button>
     </div>
 
-            <div class="form-group" style="margin-bottom:0.75rem;">
-              <label class="form-label">TÍTULO</label>
-              <input type="text" id="pred-titulo" class="form-input" placeholder="Ej: Victoria PP en próximas elecciones" />
-            </div>
-
-            <div class="form-group" style="margin-bottom:0.75rem;">
-              <label class="form-label">DESCRIPCIÓN</label>
-              <textarea id="pred-descripcion" class="form-textarea" placeholder="Análisis breve de la predicción..." rows="3"></textarea>
-            </div>
-
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;margin-bottom:0.75rem;">
-              <div class="form-group">
-                <label class="form-label">PROBABILIDAD %</label>
-                <input type="number" id="pred-prob" class="form-input" min="0" max="100" placeholder="65" />
-              </div>
-              <div class="form-group">
-                <label class="form-label">RIESGO</label>
-                <select id="pred-riesgo" class="form-select">
-                  <option value="low">Bajo</option>
-                  <option value="mid">Medio</option>
-                  <option value="high">Alto</option>
-                </select>
-              </div>
-            </div>
-
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;margin-bottom:0.75rem;">
-              <div class="form-group">
-                <label class="form-label">FECHA OBJETIVO</label>
-                <input type="date" id="pred-fecha" class="form-input" />
-              </div>
-              <div class="form-group">
-                <label class="form-label">TAGS (separados por coma)</label>
-                <input type="text" id="pred-tags" class="form-input" placeholder="política, elecciones" />
-              </div>
-            </div>
-
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;">
-              <button id="btn-save-pred" class="btn-primary">[ GUARDAR ]</button>
-              <button id="btn-clear-pred" class="btn-secondary">[ LIMPIAR ]</button>
-            </div>
-          </div>
-        </div>
-
-        <!-- Lista predicciones -->
-        <div class="admin-panel">
-          <div class="admin-panel-header" style="display:flex;justify-content:space-between;">
-            <span>▶ PREDICCIONES ACTIVAS</span>
-            <select id="filter-seccion" class="form-select" style="width:auto;font-size:10px;padding:2px 6px;">
-              <option value="espana">España</option>
-              <option value="economia">Economía</option>
-              <option value="geopolitica">Geopolítica</option>
-            </select>
-          </div>
-          <div class="admin-panel-body" id="pred-list">
-            <div class="loading-text">CARGANDO...</div>
-          </div>
-        </div>
-
-      </div>
-    </div>
-
-          <div class="form-group" style="margin-bottom:0.5rem;">
-            <label class="form-label">CONTENIDO (usa *texto* para resaltar, doble salto de línea para párrafos)</label>
-            <textarea id="analisis-contenido" class="form-textarea" rows="12"
-              placeholder="El panorama político español muestra *tensiones crecientes*...
-
-Segundo párrafo del análisis..."></textarea>
-          </div>
-
-          <div style="display:flex;gap:0.5rem;margin-top:1rem;">
-            <button id="btn-load-analisis" class="btn-secondary">[ CARGAR EXISTENTE ]</button>
-            <button id="btn-save-analisis" class="btn-primary">[ GUARDAR ANÁLISIS ]</button>
-          </div>
-        </div>
-      </div>
-    </div>
-
     <!-- TAB: CHAT -->
     <div id="tab-chat" class="admin-tab">
       <div style="max-width: 800px; display:flex; flex-direction:column; gap:1.5rem;">
 
-        <!-- Toggle -->
         <div class="admin-panel">
           <div class="admin-panel-header">▶ CONTROL DEL CANAL</div>
           <div class="admin-panel-body" style="display:flex;align-items:center;gap:1.5rem;flex-wrap:wrap;">
@@ -168,7 +90,6 @@ Segundo párrafo del análisis..."></textarea>
           </div>
         </div>
 
-        <!-- Chat admin -->
         <div class="admin-panel" id="admin-chat-panel">
           <div class="admin-panel-header" style="display:flex;justify-content:space-between;">
             <span>▶ MENSAJES</span>
@@ -187,7 +108,6 @@ Segundo párrafo del análisis..."></textarea>
 
       </div>
     </div>
-
 
     <!-- TAB: BROADCAST -->
     <div id="tab-broadcast" class="admin-tab" style="display:none;">

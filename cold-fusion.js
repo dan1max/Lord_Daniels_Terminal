@@ -2,17 +2,21 @@
 
 (function() {
 
-  // ── constants ──────────────────────────────────────────────
+  // ── dialog lines ───────────────────────────────────────────
   var CORRECT_CODE = 'congratsyouwon';
   var DIALOG_LINES = [
     'Well, I am delighted to see you, old chum.',
+    'It is good to see that, after all, someone did come. Chances were someone would show up. And here you are.',
   ];
 
   // ── state ──────────────────────────────────────────────────
-  var activated   = false;
-  var noiseRaf    = null;
-  var noiseCanvas = null;
-  var noiseCtx    = null;
+  var activated      = false;
+  var noiseRaf       = null;
+  var noiseCanvas    = null;
+  var noiseCtx       = null;
+  var dialogLineIdx  = 0;
+  var typingInterval = null;
+  var typingDone     = false;
 
   // ── noise canvas ───────────────────────────────────────────
 
@@ -39,8 +43,7 @@
     var img = noiseCtx.createImageData(w, h);
     var d   = img.data;
     for (var i = 0; i < d.length; i += 4) {
-      // green-tinted static
-      var v = Math.random() * 255 | 0;
+      var v    = Math.random() * 255 | 0;
       d[i]     = 0;
       d[i + 1] = v;
       d[i + 2] = 0;
@@ -68,9 +71,15 @@
 
     if (!noSignalEl || !revealedEl) { return; }
 
+    // Hide NO SIGNAL text instantly
+    var noSignalText = document.getElementById('cf-nosignal-text');
+    if (noSignalText) { noSignalText.style.visibility = 'hidden'; }
+    var noSignalLines = noSignalEl.querySelector('.cf-nosignal-lines');
+    if (noSignalLines) { noSignalLines.style.visibility = 'hidden'; }
+
     var start     = null;
-    var duration  = 2200; // ms
-    var flickered = false;
+    var duration  = 2200;
+    var revealed  = false;
 
     stopNoise();
 
@@ -79,29 +88,28 @@
       var elapsed  = ts - start;
       var progress = Math.min(elapsed / duration, 1);
 
-      // Flicker phase (0–30%): rapid noise alpha changes
+      // Flicker phase (0–30%)
       if (progress < 0.3) {
         var flicker = (Math.random() > 0.5) ? 1.0 : 0.4;
         drawNoise(flicker);
       }
       // Dissolve phase (30–80%): noise fades, image fades in
       else if (progress < 0.8) {
-        var t = (progress - 0.3) / 0.5; // 0→1
+        var t = (progress - 0.3) / 0.5;
         drawNoise(1 - t);
         revealedEl.style.opacity = t.toString();
         revealedEl.classList.remove('hidden');
       }
-      // Final phase (80–100%): clean up, start dialog
+      // Final phase (80–100%)
       else {
         drawNoise(0);
         revealedEl.style.opacity = '1';
-        noSignalEl.style.opacity = '0';
-        if (!flickered) {
-          flickered = true;
-          noSignalEl.style.display = 'none';
+        noSignalEl.style.display = 'none';
+        if (!revealed) {
+          revealed = true;
           if (dialogEl) {
             dialogEl.classList.remove('hidden');
-            typeDialog(DIALOG_LINES, document.getElementById('cf-dialog-text'));
+            startDialogLine(0);
           }
         }
       }
@@ -114,39 +122,68 @@
     requestAnimationFrame(step);
   }
 
-  // ── typewriter dialog ──────────────────────────────────────
+  // ── one-line-at-a-time dialog ──────────────────────────────
 
-  function typeDialog(lines, el) {
-    if (!el) { return; }
-    el.innerHTML = '';
-    var lineIdx = 0;
+  function startDialogLine(idx) {
+    dialogLineIdx = idx;
+    typingDone    = false;
 
-    function nextLine() {
-      if (lineIdx >= lines.length) { return; }
-      var line = lines[lineIdx];
-      var p    = document.createElement('div');
-      p.className = 'cf-dialog-line';
-      el.appendChild(p);
+    var textEl    = document.getElementById('cf-dialog-text');
+    var continueBtn = document.getElementById('cf-continue');
+    if (!textEl) { return; }
 
-      if (line === '') {
-        lineIdx++;
-        setTimeout(nextLine, 180);
-        return;
-      }
+    // Clear previous line
+    textEl.innerHTML = '';
+    if (continueBtn) { continueBtn.style.visibility = 'hidden'; }
 
-      var charIdx  = 0;
-      var interval = setInterval(function() {
-        p.textContent += line[charIdx];
-        charIdx++;
-        if (charIdx >= line.length) {
-          clearInterval(interval);
-          lineIdx++;
-          setTimeout(nextLine, 400);
+    var line = DIALOG_LINES[idx];
+    if (!line) { return; }
+
+    // Type out the line
+    var p = document.createElement('div');
+    p.className = 'cf-dialog-line';
+    textEl.appendChild(p);
+
+    var charIdx = 0;
+    if (typingInterval) { clearInterval(typingInterval); }
+
+    typingInterval = setInterval(function() {
+      p.textContent += line[charIdx];
+      charIdx++;
+      if (charIdx >= line.length) {
+        clearInterval(typingInterval);
+        typingInterval = null;
+        typingDone = true;
+        // Show continue button only if there's a next line
+        if (continueBtn && idx < DIALOG_LINES.length - 1) {
+          continueBtn.style.visibility = 'visible';
         }
-      }, 28);
+      }
+    }, 28);
+  }
+
+  function handleContinue() {
+    // If still typing, skip to end of current line instantly
+    if (!typingDone) {
+      if (typingInterval) { clearInterval(typingInterval); typingInterval = null; }
+      var textEl = document.getElementById('cf-dialog-text');
+      var continueBtn = document.getElementById('cf-continue');
+      if (textEl) {
+        var p = textEl.querySelector('.cf-dialog-line');
+        if (p) { p.textContent = DIALOG_LINES[dialogLineIdx]; }
+      }
+      typingDone = true;
+      if (continueBtn && dialogLineIdx < DIALOG_LINES.length - 1) {
+        continueBtn.style.visibility = 'visible';
+      }
+      return;
     }
 
-    setTimeout(nextLine, 300);
+    // Advance to next line
+    var nextIdx = dialogLineIdx + 1;
+    if (nextIdx < DIALOG_LINES.length) {
+      startDialogLine(nextIdx);
+    }
   }
 
   // ── activation logic ───────────────────────────────────────
@@ -167,7 +204,6 @@
       }
       input.value = '';
       input.focus();
-      // Glitch the monitor briefly on wrong code
       var nosignal = document.getElementById('cf-nosignal-text');
       if (nosignal) {
         nosignal.style.color = 'var(--red-alert)';
@@ -179,14 +215,12 @@
     // ✓ Correct code
     activated = true;
 
-    // Update badge
     var badge = document.getElementById('cf-status-badge');
     if (badge) {
       badge.textContent = '● COLD FUSION ACTIVE';
       badge.className   = 'cf-badge cf-badge-on';
     }
 
-    // Hide input area
     var inputWrap = document.getElementById('cf-activation-wrap');
     if (inputWrap) {
       inputWrap.style.opacity    = '0';
@@ -194,7 +228,6 @@
       setTimeout(function() { inputWrap.style.display = 'none'; }, 700);
     }
 
-    // Start dissolve
     setTimeout(dissolveToHouse, 300);
   }
 
@@ -204,8 +237,9 @@
     initNoise();
     loopNoise();
 
-    var submitBtn = document.getElementById('cf-submit');
-    var input     = document.getElementById('cf-code-input');
+    var submitBtn   = document.getElementById('cf-submit');
+    var input       = document.getElementById('cf-code-input');
+    var continueBtn = document.getElementById('cf-continue');
 
     if (submitBtn) {
       submitBtn.addEventListener('click', handleActivate);
@@ -215,12 +249,13 @@
         if (e.key === 'Enter') { e.preventDefault(); handleActivate(); }
       });
     }
+    if (continueBtn) {
+      continueBtn.addEventListener('click', handleContinue);
+    }
   }
 
-  // Expose for main.js nav switching
   window.initColdFusion = initColdFusion;
 
-  // Also auto-init when section becomes visible (called from nav handler)
   window.onColdFusionVisible = function() {
     if (!noiseRaf && !activated) {
       resizeNoise();

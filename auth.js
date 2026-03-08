@@ -30,7 +30,6 @@ document.getElementById('btn-login').addEventListener('click', async () => {
   }
 });
 
-// Enter key en login
 document.getElementById('login-password').addEventListener('keydown', e => {
   if (e.key === 'Enter') document.getElementById('btn-login').click();
 });
@@ -65,48 +64,29 @@ function showAlert(msg, type = 'success') {
   setTimeout(() => el.style.display = 'none', 3000);
 }
 
-
-document.getElementById('btn-save-analisis').addEventListener('click', async () => {
-  const seccion   = document.getElementById('analisis-seccion').value;
-  const contenido = document.getElementById('analisis-contenido').value.trim();
-
-  if (!contenido) {
-    showAlert('> ERROR: EL CONTENIDO NO PUEDE ESTAR VACÍO', 'error');
-    return;
-  }
-
-  const { error } = await upsertAnalisis(seccion, contenido);
-  if (error) {
-    showAlert('> ERROR: ' + error.message.toUpperCase(), 'error');
-  } else {
-    showAlert('> ANÁLISIS GUARDADO CORRECTAMENTE');
-  }
-});
-
 function escHtml(str) {
   const div = document.createElement('div');
   div.textContent = str;
   return div.innerHTML;
 }
 
-// CHAT ADMIN
+// ── CHAT ADMIN ────────────────────────────────────────────────────────────────
 
 let adminChatActivo = false;
-
 var _adminChatInit = false;
+
 async function initAdminChat() {
   if (_adminChatInit) { return; }
   _adminChatInit = true;
+
   adminChatActivo = await getChatActivo();
   renderToggleUI();
   await cargarAdminMensajes();
 
-  // Realtime: nuevos mensajes
   suscribirMensajes(payload => {
     appendAdminMensaje(payload.new);
   });
 
-  // Realtime: cambio de estado
   suscribirConfig(payload => {
     if (payload.new && payload.new.clave === 'chat_activo') {
       adminChatActivo = payload.new.valor === 'true';
@@ -114,21 +94,21 @@ async function initAdminChat() {
     }
   });
 
-  // Toggle
   document.getElementById('btn-toggle-chat').addEventListener('click', async () => {
     adminChatActivo = !adminChatActivo;
     await setChatActivo(adminChatActivo);
     renderToggleUI();
-    showAlert(adminChatActivo ? '> CANAL ACTIVADO — LOS VISITANTES PUEDEN CHATEAR' : '> CANAL CERRADO — NO SIGNAL');
+    showAlert(adminChatActivo
+      ? '> CANAL ACTIVADO — LOS VISITANTES PUEDEN CHATEAR'
+      : '> CANAL CERRADO — NO SIGNAL'
+    );
   });
 
-  // Enviar respuesta
   document.getElementById('admin-chat-send').addEventListener('click', enviarRespuestaAdmin);
   document.getElementById('admin-chat-msg').addEventListener('keydown', e => {
     if (e.key === 'Enter') enviarRespuestaAdmin();
   });
 
-  // Borrar todo
   document.getElementById('btn-clear-chat').addEventListener('click', async () => {
     if (!confirm('¿Borrar todos los mensajes del chat?')) return;
     const msgs = await fetchMensajes(200);
@@ -196,16 +176,12 @@ function scrollAdminChat() {
 async function enviarRespuestaAdmin() {
   const texto = document.getElementById('admin-chat-msg').value.trim();
   if (!texto) return;
-
   document.getElementById('admin-chat-msg').value = '';
   const { error } = await insertMensaje('LD', texto, true);
   if (error) showAlert('> ERROR AL ENVIAR: ' + error.message, 'error');
 }
 
-  }
-});
-
-// KILL SWITCH ADMIN
+// ── KILL SWITCH ADMIN ─────────────────────────────────────────────────────────
 
 var siteActivo = true;
 

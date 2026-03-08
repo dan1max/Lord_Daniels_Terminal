@@ -257,6 +257,7 @@
     letter-spacing: 3px;
     outline: none;
     caret-color: var(--green-bright);
+    -webkit-text-security: disc;
   }
 
   .cf-code-input:focus {
@@ -489,10 +490,11 @@
           <div class="cf-activation-wrap" id="cf-activation-wrap">
             <label class="cf-activation-label">COLD FUSION ACTIVATION CODE:</label>
             <div class="cf-activation-row">
-              <input id="cf-code-input" class="cf-code-input" type="password"
+              <input id="cf-code-input" class="cf-code-input" type="text"
                 placeholder="▓▓▓▓▓▓▓▓▓▓▓▓▓"
                 autocomplete="off" autocorrect="off" autocapitalize="off"
-                spellcheck="false" enterkeyhint="go" />
+                spellcheck="false" enterkeyhint="go"
+                data-lpignore="true" data-1p-ignore />
               <button id="cf-submit" class="cf-submit-btn">[ AUTHENTICATE ]</button>
             </div>
             <div id="cf-error" class="cf-error hidden">ACCESS DENIED — INVALID ACTIVATION CODE</div>

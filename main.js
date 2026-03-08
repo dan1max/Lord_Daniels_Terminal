@@ -108,16 +108,21 @@ if (hamburger && navItems) {
   });
 }
 
+var cfInited = false;
+
 document.querySelectorAll('.nav-btn[data-section]').forEach(function(btn) {
   btn.addEventListener('click', function() {
     var target = btn.dataset.section;
-    document.querySelectorAll('.terminal-section').forEach(function(s) { s.classList.remove('active'); s.classList.add('hidden'); });
+    document.querySelectorAll('.terminal-section').forEach(function(s) { s.classList.add('hidden'); });
     document.getElementById('section-' + target).classList.remove('hidden');
-    document.getElementById('section-' + target).classList.add('active');
     document.querySelectorAll('.nav-btn[data-section]').forEach(function(b) { b.classList.remove('active'); });
     btn.classList.add('active');
     if (navItems) { navItems.classList.remove('open'); }
     if (hamburger) { hamburger.classList.remove('open'); hamburger.textContent = '[ MENU ▼ ]'; }
+    if (target === 'coldfusion') {
+      if (!cfInited) { cfInited = true; initColdFusion(); }
+      else if (window.onColdFusionVisible) { window.onColdFusionVisible(); }
+    }
   });
 });
 

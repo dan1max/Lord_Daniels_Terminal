@@ -223,6 +223,37 @@
     50%       { opacity: 0; }
   }
 
+  .cf-dialog-footer {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 0.75rem;
+  }
+
+  .cf-continue-btn {
+    background: transparent;
+    border: 1px solid var(--green-dim);
+    color: var(--green-dim);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 1px;
+    padding: 0.4rem 0.9rem;
+    cursor: pointer;
+    transition: all 0.15s;
+    animation: cf-continue-pulse 1.4s ease-in-out infinite;
+  }
+
+  .cf-continue-btn:hover {
+    border-color: var(--green-bright);
+    color: var(--green-bright);
+    text-shadow: 0 0 8px var(--green-glow);
+    animation: none;
+  }
+
+  @keyframes cf-continue-pulse {
+    0%, 100% { opacity: 1; }
+    50%       { opacity: 0.45; }
+  }
+
   /* Activation input */
   .cf-activation-wrap {
     display: flex;
@@ -307,7 +338,7 @@
   </style>
 </head>
 <body>
-      <div class="init-sub">[ PRESS ANY KEY OR CLICK TO INITIALIZE ]</div>
+      <div class="init-sub">[ DANCO PROPERTY ]</div>
     </div>
   </div>
 
@@ -484,6 +515,9 @@
           <!-- Dialog box (appears after reveal) -->
           <div id="cf-dialog" class="cf-dialog hidden">
             <div id="cf-dialog-text"></div>
+            <div class="cf-dialog-footer">
+              <button id="cf-continue" class="cf-continue-btn" style="visibility:hidden;">[ CONTINUE ]</button>
+            </div>
           </div>
 
           <!-- Activation input -->

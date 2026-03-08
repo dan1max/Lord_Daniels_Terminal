@@ -1,33 +1,5 @@
 // Property of dani.co
 
-// ============================================================
-// PUZZLE TRAIL (spoilers):
-//
-// dancoind/        → HOUSE
-//   Clue: /personnel/codex.txt → "Director's registered codename"
-//         /personnel/staff_list.txt → CEO row codename = HOUSE
-//
-// projects/        → PLATINUM
-//   Clue: /personnel/memo_hr.txt → "named for its properties"
-//         /dancoind/director_log.txt → "Platinum does not corrode."
-//
-// classified/      → EXODUS
-//   Clue: project_lazarus.txt → "Protocol designation in AEGIS"
-//         project_aegis.txt → "Phase 4 designated as Protocol EXODUS"
-//         personnel_l2/cipher_dispatch.txt → mentions EXODUS clearance
-//
-// dr_lazarus/      → LAZARUS
-//   Clue: upload_log.txt → "sub-partition secured under operator codename"
-//         project_lazarus.txt → "secured under my operator credentials. My codename."
-//         *** go back to /personnel/staff_list.txt for Dr. Vasquez's codename ***
-//
-// mind_transfer/   → 2041
-//   Clue: /personnel/codex.txt → "year of the neural transfer"
-//         upload_log.txt → "DATE: March 14, 2041"
-//
-// Final cipher: FOAOVLWSLWYHRN | Vigenere key: DANIEL → CONGRATSYOUWON
-// ============================================================
-
 var FS = {
   type: 'dir',
   children: {

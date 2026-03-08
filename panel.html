@@ -71,31 +71,10 @@
 
     <!-- TABS -->
     <div style="display:flex;gap:0.5rem;margin-bottom:1.5rem;border-bottom:1px solid var(--green-dark);padding-bottom:0.5rem;">
-      <button class="nav-btn active" data-tab="predicciones">[ PREDICCIONES ]</button>
-      <button class="nav-btn" data-tab="analisis">[ ANÁLISIS ]</button>
-      <button class="nav-btn" data-tab="chat">[ CHAT ]</button>
+      <button class="nav-btn active" data-tab="chat">[ CHAT ]</button>
       <button class="nav-btn" data-tab="broadcast">[ BROADCAST ]</button>
     </div>
 
-    <!-- TAB: PREDICCIONES -->
-    <div id="tab-predicciones" class="admin-tab">
-      <div class="admin-grid">
-
-        <!-- Formulario añadir -->
-        <div class="admin-panel">
-          <div class="admin-panel-header">▶ AÑADIR / EDITAR PREDICCIÓN</div>
-          <div class="admin-panel-body">
-
-            <input type="hidden" id="pred-id" value="" />
-
-            <div class="form-group" style="margin-bottom:0.75rem;">
-              <label class="form-label">SECCIÓN</label>
-              <select id="pred-seccion" class="form-select">
-                <option value="espana">España</option>
-                <option value="economia">Economía Global</option>
-                <option value="geopolitica">Geopolítica</option>
-              </select>
-            </div>
 
             <div class="form-group" style="margin-bottom:0.75rem;">
               <label class="form-label">TÍTULO</label>
@@ -158,20 +137,6 @@
       </div>
     </div>
 
-    <!-- TAB: ANÁLISIS -->
-    <div id="tab-analisis" class="admin-tab" style="display:none;">
-      <div class="admin-panel" style="max-width:800px;">
-        <div class="admin-panel-header">▶ EDITAR ANÁLISIS</div>
-        <div class="admin-panel-body">
-
-          <div class="form-group" style="margin-bottom:1rem;">
-            <label class="form-label">SECCIÓN</label>
-            <select id="analisis-seccion" class="form-select">
-              <option value="espana">España</option>
-              <option value="economia">Economía Global</option>
-              <option value="geopolitica">Geopolítica</option>
-            </select>
-          </div>
 
           <div class="form-group" style="margin-bottom:0.5rem;">
             <label class="form-label">CONTENIDO (usa *texto* para resaltar, doble salto de línea para párrafos)</label>
@@ -190,7 +155,7 @@ Segundo párrafo del análisis..."></textarea>
     </div>
 
     <!-- TAB: CHAT -->
-    <div id="tab-chat" class="admin-tab" style="display:none;">
+    <div id="tab-chat" class="admin-tab">
       <div style="max-width: 800px; display:flex; flex-direction:column; gap:1.5rem;">
 
         <!-- Toggle -->

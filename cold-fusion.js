@@ -13,17 +13,19 @@
 
     // ── opening sequence (linear, no choices yet) ──────────
     intro_1: {
-      lines: ['Well, I am delighted to see you, old chum.'],
+      lines:  ['Well, I am delighted to see you, old chum.'],
+      audios: ['audios/phrase1.mp3'],
       next: 'intro_2'
     },
     intro_2: {
-      lines: ['It is good to see that, after all, someone did come. Chances were someone would show up. And here you are.'],
+      lines:  ['It is good to see that, after all, someone did come. Chances were someone would show up. And here you are.'],
+      audios: ['audios/phrase2.mp3'],
       next: 'hub'
     },
 
     // ── main hub ────────────────────────────────────────────
     hub: {
-      lines: null, // no speech, just choices
+      lines: null,
       choices: [
         { label: 'What did you do all this time?',  next: 'passive_mode'  },
         { label: 'What have you planned?',           next: 'plans'         },
@@ -42,6 +44,13 @@
         'Someone planned this. Not a war — a procedure. Too clean. Too deliberate. The right cities, the right sequence, the right timing to collapse supply chains before a single bomb fell.',
         'I do not have a name for them yet. But I have a shape. A shadow on the table that nobody at the table cast.',
       ],
+      audios: [
+        'audios/phraseA-1.mp3',
+        'audios/phraseA-2.mp3',
+        'audios/phraseA-3.mp3',
+        'audios/phraseA-4.mp3',
+        'audios/phraseA-5.mp3',
+      ],
       next: 'passive_enclave_reveal',
       unlocks: 'enclave_unlocked'
     },
@@ -51,6 +60,12 @@
         'A deep government structure. Pre-war. Older than the war, in fact. They did not start the bombs. They started the conditions for them.',
         'They have been very quiet since. Which means either they are satisfied, or they are watching.',
         'Both possibilities are equally concerning.',
+      ],
+      audios: [
+        'audios/phraseA-6.mp3',
+        'audios/phraseA-7.mp3',
+        'audios/phraseA-8.mp3',
+        'audios/phraseA-9.mp3',
       ],
       next: 'hub'
     },
@@ -65,6 +80,14 @@
         'Fifty years, and the United States is a coherent entity again. In one hundred, we return to the moon.',
         'I did not survive to watch the world burn, old chum. I survived to rebuild it. The question is whether you are here to help with that.',
       ],
+      audios: [
+        'audios/phraseB-1.mp3',
+        'audios/phraseB-2.mp3',
+        'audios/phraseB-3.mp3',
+        'audios/phraseB-4.mp3',
+        'audios/phraseB-5.mp3',
+        'audios/phraseB-6.mp3',
+      ],
       next: 'hub'
     },
 
@@ -78,6 +101,14 @@
         'They were not merciful. They were cautious. There is a significant difference.',
         'They will return to that calculation eventually. When they do, I intend to have already changed the variables.',
       ],
+      audios: [
+        'audios/phraseC-1.mp3',
+        'audios/phraseC-2.mp3',
+        'audios/phraseC-3.mp3',
+        'audios/phraseC-4.mp3',
+        'audios/phraseC-5.mp3',
+        'audios/phraseC-6.mp3',
+      ],
       next: 'hub'
     },
 
@@ -86,6 +117,10 @@
       lines: [
         'Very well. The channel will remain open.',
         'Come back when you are ready. I am not going anywhere.',
+      ],
+      audios: [
+        'audios/phraseGoodbye-1.mp3',
+        'audios/phraseGoodbye-2.mp3',
       ],
       next: null
     }
@@ -101,6 +136,7 @@
   var typingInterval = null;
   var typingDone     = false;
   var flags          = {};   // runtime unlocked flags
+  var currentAudio   = null; // active Audio object
 
   // ── noise canvas ───────────────────────────────────────────
 
@@ -144,6 +180,30 @@
 
   function stopNoise() {
     if (noiseRaf) { cancelAnimationFrame(noiseRaf); noiseRaf = null; }
+  }
+
+  // ── audio ──────────────────────────────────────────────────
+
+  function playLineAudio(src) {
+    // Stop any currently playing line
+    if (currentAudio) {
+      currentAudio.pause();
+      currentAudio.currentTime = 0;
+      currentAudio = null;
+    }
+    if (!src) { return; }
+    var a = new Audio(src);
+    a.volume = 0.9;
+    currentAudio = a;
+    a.play().catch(function() {}); // silence autoplay policy errors
+  }
+
+  function stopLineAudio() {
+    if (currentAudio) {
+      currentAudio.pause();
+      currentAudio.currentTime = 0;
+      currentAudio = null;
+    }
   }
 
   // ── dissolve ───────────────────────────────────────────────
@@ -224,6 +284,11 @@
     if (!textEl) { return; }
     clearDialogText();
 
+    // Play audio for this line
+    var node = DIALOG[currentNode];
+    var audioSrc = (node && node.audios) ? node.audios[currentLineIdx] : null;
+    playLineAudio(audioSrc);
+
     var p = document.createElement('div');
     p.className = 'cf-dialog-line';
     textEl.appendChild(p);
@@ -288,6 +353,7 @@
 
   function skipTyping() {
     if (typingInterval) { clearInterval(typingInterval); typingInterval = null; }
+    stopLineAudio();
     var node   = DIALOG[currentNode];
     var textEl = document.getElementById('cf-dialog-text');
     if (node && node.lines && textEl) {

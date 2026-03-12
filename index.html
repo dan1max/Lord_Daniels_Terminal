@@ -298,6 +298,52 @@
     text-shadow: none !important;
   }
 
+  /* CONNECTION LOST text — amber tint to differentiate from NO SIGNAL */
+  .cf-connlost-text {
+    color: var(--amber) !important;
+    text-shadow: 0 0 8px rgba(255,176,0,0.3) !important;
+    animation: cf-connlost-glitch 1s steps(1) infinite !important;
+  }
+
+  @keyframes cf-connlost-glitch {
+    0%   { color: var(--amber); transform: translateX(0); }
+    2%   { color: #ffcc00; transform: translateX(-3px); clip-path: inset(10% 0 75% 0); }
+    4%   { color: var(--amber); transform: translateX(2px); clip-path: inset(60% 0 10% 0); }
+    6%   { color: var(--amber); transform: translateX(0); clip-path: none; }
+    100% { color: var(--amber); transform: translateX(0); clip-path: none; }
+  }
+
+  /* RECONNECT button */
+  .cf-reconnect-wrap {
+    margin-top: 0.9rem;
+  }
+
+  .cf-reconnect-wrap.hidden { display: none !important; }
+
+  .cf-reconnect-btn {
+    background: transparent;
+    border: 1px solid var(--amber);
+    color: var(--amber);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: 2px;
+    padding: 0.6rem 1.4rem;
+    cursor: pointer;
+    transition: all 0.15s;
+    animation: cf-reconnect-pulse 1.4s ease-in-out infinite;
+  }
+
+  .cf-reconnect-btn:hover {
+    background: rgba(255,176,0,0.06);
+    text-shadow: 0 0 8px rgba(255,176,0,0.6);
+    animation: none;
+  }
+
+  @keyframes cf-reconnect-pulse {
+    0%, 100% { opacity: 1; }
+    50%       { opacity: 0.4; }
+  }
+
   /* Activation input */
   .cf-activation-wrap {
     display: flex;
@@ -546,6 +592,18 @@
                 <img src="mr-house.png" alt="" class="cf-mrhouse-img" />
               </div>
 
+              <!-- CONNECTION LOST overlay -->
+              <div id="cf-connlost" class="cf-nosignal hidden">
+                <div class="cf-nosignal-overlay">
+                  <div id="cf-connlost-text" class="cf-nosignal-text cf-connlost-text">CONNECTION LOST</div>
+                  <div class="cf-nosignal-lines">
+                    <div class="cf-nosignal-line"></div>
+                    <div class="cf-nosignal-line"></div>
+                    <div class="cf-nosignal-line"></div>
+                  </div>
+                </div>
+              </div>
+
               <!-- CRT overlays (always on top) -->
               <div class="cf-monitor-scanlines"></div>
               <div class="cf-monitor-vignette"></div>
@@ -557,6 +615,9 @@
           <div id="cf-dialog" class="cf-dialog hidden">
             <div id="cf-dialog-text"></div>
             <div id="cf-choices" class="cf-choices hidden"></div>
+            <div id="cf-reconnect-wrap" class="cf-reconnect-wrap hidden">
+              <button id="cf-reconnect" class="cf-reconnect-btn">[ RECONNECT ]</button>
+            </div>
             <div class="cf-dialog-footer">
               <button id="cf-continue" class="cf-continue-btn" style="visibility:hidden;">[ CONTINUE ]</button>
             </div>

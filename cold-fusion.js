@@ -330,8 +330,8 @@
       showChoices(node.choices);
       hideContinueBtn();
     } else {
-      // End of dialog
-      hideContinueBtn();
+      // End of dialog — last line of goodbye, show final continue that disconnects
+      setContinueBtn('[ CONTINUE ]', disconnectFromHouse);
     }
   }
 
@@ -430,6 +430,90 @@
     if (el) { el.innerHTML = ''; }
   }
 
+  // ── disconnect / reconnect ─────────────────────────────────
+
+  function disconnectFromHouse() {
+    var revealedEl  = document.getElementById('cf-revealed');
+    var connLostEl  = document.getElementById('cf-connlost');
+    var dialogEl    = document.getElementById('cf-dialog');
+
+    hideContinueBtn();
+    hideChoices();
+    clearDialogText();
+    if (dialogEl) { dialogEl.classList.add('hidden'); }
+
+    var start    = null;
+    var duration = 2200;
+    var done     = false;
+
+    function step(ts) {
+      if (!start) { start = ts; }
+      var progress = Math.min((ts - start) / duration, 1);
+
+      if (revealedEl) {
+        revealedEl.style.opacity = (1 - progress).toString();
+      }
+
+      if (progress >= 1 && !done) {
+        done = true;
+        if (revealedEl) { revealedEl.classList.add('hidden'); revealedEl.style.opacity = '0'; }
+        // Show CONNECTION LOST
+        if (connLostEl) { connLostEl.classList.remove('hidden'); }
+        // Show RECONNECT button in dialog area
+        var reconnectEl = document.getElementById('cf-reconnect-wrap');
+        if (reconnectEl) {
+          if (dialogEl) { dialogEl.classList.remove('hidden'); }
+          reconnectEl.classList.remove('hidden');
+        }
+      }
+
+      if (progress < 1) { requestAnimationFrame(step); }
+    }
+
+    requestAnimationFrame(step);
+  }
+
+  function reconnectToHouse() {
+    var revealedEl    = document.getElementById('cf-revealed');
+    var connLostEl    = document.getElementById('cf-connlost');
+    var reconnectEl   = document.getElementById('cf-reconnect-wrap');
+    var dialogEl      = document.getElementById('cf-dialog');
+
+    // Hide reconnect UI
+    if (reconnectEl)  { reconnectEl.classList.add('hidden'); }
+    if (connLostEl)   { connLostEl.classList.add('hidden'); }
+    if (dialogEl)     { dialogEl.classList.add('hidden'); }
+
+    // Fade Mr House back in
+    if (revealedEl) {
+      revealedEl.style.opacity = '0';
+      revealedEl.classList.remove('hidden');
+    }
+
+    var start    = null;
+    var duration = 2200;
+    var done     = false;
+
+    function step(ts) {
+      if (!start) { start = ts; }
+      var progress = Math.min((ts - start) / duration, 1);
+
+      if (revealedEl) { revealedEl.style.opacity = progress.toString(); }
+
+      if (progress >= 1 && !done) {
+        done = true;
+        if (revealedEl) { revealedEl.style.opacity = '1'; }
+        // Re-open dialog and go straight to hub
+        if (dialogEl) { dialogEl.classList.remove('hidden'); }
+        enterNode('hub');
+      }
+
+      if (progress < 1) { requestAnimationFrame(step); }
+    }
+
+    requestAnimationFrame(step);
+  }
+
   // ── activation ─────────────────────────────────────────────
 
   function handleActivate() {
@@ -479,8 +563,9 @@
     initNoise();
     loopNoise();
 
-    var submitBtn = document.getElementById('cf-submit');
-    var input     = document.getElementById('cf-code-input');
+    var submitBtn    = document.getElementById('cf-submit');
+    var input        = document.getElementById('cf-code-input');
+    var reconnectBtn = document.getElementById('cf-reconnect');
 
     if (submitBtn) { submitBtn.addEventListener('click', handleActivate); }
     if (input) {
@@ -488,6 +573,7 @@
         if (e.key === 'Enter') { e.preventDefault(); handleActivate(); }
       });
     }
+    if (reconnectBtn) { reconnectBtn.addEventListener('click', reconnectToHouse); }
   }
 
   window.initColdFusion = initColdFusion;

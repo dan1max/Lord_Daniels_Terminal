@@ -179,6 +179,7 @@ function initRealtimeConfig() {
 }
 
 function showKillScreen() {
+  if (window.stopColdFusion) { window.stopColdFusion(); }
   var ks = document.getElementById('kill-screen');
   if (!ks) { return; }
   ks.classList.remove('hidden');

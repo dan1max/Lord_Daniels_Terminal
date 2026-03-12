@@ -583,6 +583,12 @@
 
   window.initColdFusion = initColdFusion;
 
+  window.stopColdFusion = function() {
+    stopNoise();
+    stopLineAudio();
+    if (typingInterval) { clearInterval(typingInterval); typingInterval = null; }
+  };
+
   window.onColdFusionVisible = function() {
     if (!noiseRaf && !activated) { resizeNoise(); loopNoise(); }
   };

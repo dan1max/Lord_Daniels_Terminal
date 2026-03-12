@@ -442,6 +442,13 @@
     clearDialogText();
     if (dialogEl) { dialogEl.classList.add('hidden'); }
 
+    // Make sure it's visible but fully opaque before animating
+    if (revealedEl) {
+      revealedEl.classList.remove('hidden');
+      revealedEl.style.opacity = '1';
+      revealedEl.style.pointerEvents = 'none';
+    }
+
     var start    = null;
     var duration = 2200;
     var done     = false;
@@ -456,10 +463,8 @@
 
       if (progress >= 1 && !done) {
         done = true;
-        if (revealedEl) { revealedEl.classList.add('hidden'); revealedEl.style.opacity = '0'; }
-        // Show CONNECTION LOST
+        // Don't add 'hidden' — just leave opacity:0 to avoid abrupt jump
         if (connLostEl) { connLostEl.classList.remove('hidden'); }
-        // Show RECONNECT button in dialog area
         var reconnectEl = document.getElementById('cf-reconnect-wrap');
         if (reconnectEl) {
           if (dialogEl) { dialogEl.classList.remove('hidden'); }

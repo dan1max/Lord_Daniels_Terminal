@@ -298,21 +298,6 @@
     text-shadow: none !important;
   }
 
-  /* CONNECTION LOST text — amber tint to differentiate from NO SIGNAL */
-  .cf-connlost-text {
-    color: var(--amber) !important;
-    text-shadow: 0 0 8px rgba(255,176,0,0.3) !important;
-    animation: cf-connlost-glitch 1s steps(1) infinite !important;
-  }
-
-  @keyframes cf-connlost-glitch {
-    0%   { color: var(--amber); transform: translateX(0); }
-    2%   { color: #ffcc00; transform: translateX(-3px); clip-path: inset(10% 0 75% 0); }
-    4%   { color: var(--amber); transform: translateX(2px); clip-path: inset(60% 0 10% 0); }
-    6%   { color: var(--amber); transform: translateX(0); clip-path: none; }
-    100% { color: var(--amber); transform: translateX(0); clip-path: none; }
-  }
-
   /* RECONNECT button */
   .cf-reconnect-wrap {
     margin-top: 0.9rem;
